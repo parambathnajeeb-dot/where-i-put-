@@ -19,30 +19,37 @@
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     }
+    @keyframes pinPulse {
+      0%, 100% { transform: translate(-50%, -50%) scale(1); box-shadow: 0 0 0 0 rgba(217, 119, 6, 0.7); }
+      50% { transform: translate(-50%, -50%) scale(1.12); box-shadow: 0 0 0 10px rgba(217, 119, 6, 0); }
+    }
+    .spot-pin {
+      animation: pinPulse 1.8s infinite;
+    }
   </style>
 </head>
 <body class="bg-stone-100 dark:bg-stone-950 text-stone-900 dark:text-stone-100 min-h-screen pb-24 antialiased transition-colors">
 
   <!-- Top App Bar -->
-  <header class="sticky top-0 z-30 bg-stone-100/90 dark:bg-stone-950/90 backdrop-blur border-b border-stone-200/80 dark:border-stone-800">
-    <div class="max-w-lg mx-auto px-4 h-14 flex items-center justify-between gap-2">
+  <header class="sticky top-0 z-30 bg-stone-100/95 dark:bg-stone-950/95 backdrop-blur border-b border-stone-200/80 dark:border-stone-800">
+    <div class="max-w-lg mx-auto px-3.5 h-14 flex items-center justify-between gap-2">
       <div class="flex items-center gap-2 min-w-0">
         <span class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-amber-600 text-white text-sm font-bold shadow-sm shrink-0">📦</span>
-        <span class="font-extrabold tracking-tight text-base sm:text-lg truncate">Where Did I Put It?</span>
-        <span class="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-stone-200 dark:bg-stone-800 text-stone-600 dark:text-stone-400 shrink-0">v5.2</span>
+        <span class="font-extrabold tracking-tight text-sm sm:text-base whitespace-nowrap">Where Did I Put It?</span>
+        <span class="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-amber-100 dark:bg-amber-900/50 text-amber-800 dark:text-amber-300 shrink-0">v6.0</span>
       </div>
       <div class="flex items-center gap-1.5 shrink-0">
         <button
           id="header-lock-btn"
           type="button"
-          class="hidden rounded-full border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-900 px-2.5 py-1 text-xs font-semibold text-stone-700 dark:text-stone-200 hover:bg-stone-50 dark:hover:bg-stone-800 transition cursor-pointer"
+          class="hidden rounded-full border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-900 px-2.5 py-1 text-[11px] font-semibold text-stone-700 dark:text-stone-200 hover:bg-stone-50 dark:hover:bg-stone-800 transition cursor-pointer"
         >
-          🔒 Locked
+          🔒 Unlock
         </button>
         <button
           id="theme-btn"
           type="button"
-          class="rounded-full border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-900 px-3 py-1 text-xs font-semibold text-stone-700 dark:text-stone-200 hover:bg-stone-50 dark:hover:bg-stone-800 transition cursor-pointer"
+          class="rounded-full border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-900 px-2.5 py-1 text-[11px] font-semibold text-stone-700 dark:text-stone-200 hover:bg-stone-50 dark:hover:bg-stone-800 transition cursor-pointer"
         >
           🌙 Dark
         </button>
@@ -56,11 +63,10 @@
     <section id="view-home" class="space-y-5">
       <!-- Hero Welcome Card -->
       <div class="bg-gradient-to-br from-amber-600 to-amber-700 text-white rounded-3xl p-5 shadow-md">
-        <p class="text-amber-100 text-xs font-semibold uppercase tracking-wider">Home Organizer</p>
-        <h1 class="text-xl sm:text-2xl font-extrabold mt-1">Find anything in seconds</h1>
-        <p class="text-amber-100 text-sm mt-1">Track keys, documents, lent items, stock counts, and check-up dates.</p>
+        <p class="text-amber-100 text-[11px] font-bold uppercase tracking-wider">Home Organizer</p>
+        <h1 class="text-xl sm:text-2xl font-extrabold mt-1 leading-tight">Find anything in seconds</h1>
+        <p class="text-amber-100 text-sm mt-1">Track spots, pin photos, lent items, stock counts, and expiry dates.</p>
 
-        <!-- Primary Action Buttons -->
         <div class="grid grid-cols-2 gap-2.5 mt-4">
           <button
             id="home-add-btn"
@@ -82,13 +88,13 @@
       </div>
 
       <!-- Quick Search Bar with Voice -->
-      <div class="bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 p-3 shadow-sm">
+      <div class="bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 p-2.5 shadow-sm">
         <div class="relative flex items-center gap-2">
           <div class="relative flex-1">
             <input
               id="home-search-input"
               type="search"
-              placeholder="Quick search (e.g., Passport, Kitchen)..."
+              placeholder="Search items, places, or rooms..."
               class="w-full rounded-xl bg-stone-100 dark:bg-stone-800 pl-9 pr-3 py-2.5 text-sm text-stone-900 dark:text-stone-100 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-amber-500"
             />
             <span class="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 text-sm pointer-events-none">🔍</span>
@@ -108,19 +114,19 @@
       <div class="grid grid-cols-4 gap-2">
         <button id="stat-total-btn" type="button" class="bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 p-3 text-left shadow-sm hover:border-amber-400 transition cursor-pointer">
           <p id="stat-total" class="text-xl font-extrabold text-stone-900 dark:text-stone-50">0</p>
-          <p class="text-[11px] font-medium text-stone-500 dark:text-stone-400 mt-0.5">Saved</p>
+          <p class="text-[11px] font-semibold text-stone-500 dark:text-stone-400 mt-0.5">Saved</p>
         </button>
         <button id="stat-pinned-btn" type="button" class="bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 p-3 text-left shadow-sm hover:border-amber-400 transition cursor-pointer">
           <p id="stat-pinned" class="text-xl font-extrabold text-amber-600 dark:text-amber-400">0</p>
-          <p class="text-[11px] font-medium text-stone-500 dark:text-stone-400 mt-0.5">Pinned</p>
+          <p class="text-[11px] font-semibold text-stone-500 dark:text-stone-400 mt-0.5">Pinned</p>
         </button>
         <button id="stat-lent-btn" type="button" class="bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 p-3 text-left shadow-sm hover:border-sky-400 transition cursor-pointer">
           <p id="stat-lent" class="text-xl font-extrabold text-sky-600 dark:text-sky-400">0</p>
-          <p class="text-[11px] font-medium text-stone-500 dark:text-stone-400 mt-0.5">Lent Out</p>
+          <p class="text-[11px] font-semibold text-stone-500 dark:text-stone-400 mt-0.5">Lent Out</p>
         </button>
         <button id="stat-rooms-btn" type="button" class="bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 p-3 text-left shadow-sm hover:border-amber-400 transition cursor-pointer">
           <p id="stat-rooms" class="text-xl font-extrabold text-stone-900 dark:text-stone-50">0</p>
-          <p class="text-[11px] font-medium text-stone-500 dark:text-stone-400 mt-0.5">Rooms</p>
+          <p class="text-[11px] font-semibold text-stone-500 dark:text-stone-400 mt-0.5">Rooms</p>
         </button>
       </div>
 
@@ -132,7 +138,7 @@
       >
         <div class="flex items-center justify-between gap-2">
           <div>
-            <p class="text-xs font-bold text-red-800 dark:text-red-300">⚠️ Check-up / Expiry Alert</p>
+            <p class="text-xs font-bold text-red-800 dark:text-red-300">⚠️ Expiry Alert</p>
             <p id="home-expiry-desc" class="text-xs text-red-700 dark:text-red-400 mt-0.5"></p>
           </div>
           <span class="text-xs font-bold text-red-700 dark:text-red-300 shrink-0">View →</span>
@@ -146,7 +152,7 @@
         class="hidden w-full text-left bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/70 rounded-2xl p-3 shadow-sm hover:bg-amber-100/70 transition cursor-pointer"
       >
         <div class="flex items-center justify-between gap-2">
-          <p class="text-xs font-semibold text-amber-900 dark:text-amber-300">🔔 Turn on expiry alerts when opening the app</p>
+          <p class="text-xs font-semibold text-amber-900 dark:text-amber-300">🔔 Enable expiry alerts when opening the app</p>
           <span class="text-xs font-bold text-amber-700 dark:text-amber-400 shrink-0">Enable</span>
         </div>
       </button>
@@ -156,12 +162,12 @@
         <div class="flex items-center justify-between mb-2.5">
           <h2 class="text-sm font-bold text-stone-800 dark:text-stone-200">📌 Pinned Essentials</h2>
           <button id="home-see-all-btn" type="button" class="text-xs font-semibold text-amber-700 dark:text-amber-400 hover:underline cursor-pointer">
-            See all →
+            See All →
           </button>
         </div>
         <ul id="home-pinned-list" class="space-y-2.5"></ul>
         <div id="home-pinned-empty" class="hidden bg-white dark:bg-stone-900 rounded-2xl border border-dashed border-stone-300 dark:border-stone-700 p-5 text-center text-xs text-stone-500 dark:text-stone-400">
-          Tap 📌 on any saved item to pin essentials right here on your Home screen.
+          Tap 📌 on any saved item to pin essentials to your Home screen.
         </div>
       </div>
     </section>
@@ -204,14 +210,14 @@
         <span class="text-amber-700 dark:text-amber-400 font-bold">Unlock →</span>
       </button>
 
-      <!-- Search + Voice + Room Filter Chips -->
+      <!-- Search + Voice + Filter Chips -->
       <div class="space-y-2.5">
         <div class="flex items-center gap-2">
           <div class="relative flex-1">
             <input
               id="list-search-input"
               type="search"
-              placeholder="Search item, place, room, person..."
+              placeholder="Search items, places, rooms, or people..."
               class="w-full rounded-xl border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-900 pl-9 pr-3 py-2.5 text-sm text-stone-900 dark:text-stone-100 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-amber-500"
             />
             <span class="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 text-sm pointer-events-none">🔍</span>
@@ -233,7 +239,7 @@
       <div id="items-empty" class="hidden bg-white dark:bg-stone-900 rounded-2xl border border-dashed border-stone-300 dark:border-stone-700 p-8 text-center">
         <p id="items-empty-msg" class="text-sm text-stone-500 dark:text-stone-400">No items found.</p>
         <button id="clear-filter-btn" type="button" class="hidden mt-3 rounded-lg bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-200 text-xs font-semibold px-3 py-1.5 cursor-pointer">
-          Clear search &amp; filter
+          Clear Search &amp; Filter
         </button>
       </div>
     </section>
@@ -251,7 +257,7 @@
         <form id="item-form" class="space-y-4">
           <div>
             <label for="f-name" class="block text-xs font-bold uppercase tracking-wide text-stone-500 dark:text-stone-400 mb-1.5">
-              What is it? *
+              Item Name *
             </label>
             <div class="flex gap-2">
               <input
@@ -274,7 +280,7 @@
 
           <div>
             <label for="f-place" class="block text-xs font-bold uppercase tracking-wide text-stone-500 dark:text-stone-400 mb-1.5">
-              Where did you put it? *
+              Storage Location *
             </label>
             <div class="flex gap-2">
               <input
@@ -297,12 +303,12 @@
 
           <div>
             <label for="f-room" class="block text-xs font-bold uppercase tracking-wide text-stone-500 dark:text-stone-400 mb-1.5">
-              Room or Box Tag (tap a preset or type your own)
+              Room or Box Tag
             </label>
             <input
               id="f-room"
               type="text"
-              placeholder="e.g., Kitchen, Bedroom, Attic Box 1"
+              placeholder="Tap a preset below or type your own"
               class="w-full rounded-xl border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-800 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
             />
             <div id="form-room-presets" class="flex flex-wrap gap-1.5 mt-2"></div>
@@ -345,12 +351,12 @@
             />
           </div>
 
-          <!-- Photo of the Spot -->
+          <!-- Photo of the Spot + Visual Spot Pin -->
           <div>
             <span class="block text-xs font-bold uppercase tracking-wide text-stone-500 dark:text-stone-400 mb-1.5">
-              Photo of the Spot (optional)
+              Spot Photo &amp; Visual Pin (optional)
             </span>
-            <div class="flex items-center gap-3">
+            <div class="flex flex-wrap items-center gap-3">
               <button
                 id="f-photo-btn"
                 type="button"
@@ -359,16 +365,32 @@
                 📷 Add / Take Photo
               </button>
               <button
+                id="f-photo-clear-pin"
+                type="button"
+                class="hidden text-xs font-semibold text-amber-700 dark:text-amber-400 hover:underline cursor-pointer"
+              >
+                Clear Pin
+              </button>
+              <button
                 id="f-photo-remove"
                 type="button"
                 class="hidden text-xs font-semibold text-red-600 dark:text-red-400 hover:underline cursor-pointer"
               >
-                Remove photo
+                Remove Photo
               </button>
             </div>
             <input id="f-photo" type="file" accept="image/*" capture="environment" class="hidden" />
-            <div id="f-photo-preview-wrap" class="hidden mt-2.5">
-              <img id="f-photo-preview" alt="Selected spot preview" class="w-28 h-28 object-cover rounded-2xl border border-stone-200 dark:border-stone-700 shadow-sm" />
+
+            <div id="f-photo-preview-wrap" class="hidden mt-3 space-y-1.5">
+              <p class="text-[11px] font-semibold text-amber-700 dark:text-amber-400">
+                📍 Tap anywhere on the photo to mark the exact drawer or shelf
+              </p>
+              <div id="f-photo-stage" class="relative inline-block max-w-full rounded-2xl overflow-hidden border border-stone-200 dark:border-stone-700 shadow-sm cursor-crosshair select-none">
+                <img id="f-photo-preview" alt="Selected spot preview" class="block max-w-full max-h-64 object-contain" />
+                <div id="f-photo-pin-marker" class="hidden spot-pin absolute w-6 h-6 rounded-full bg-amber-600 border-2 border-white shadow-lg flex items-center justify-center text-[11px] pointer-events-none">
+                  📍
+                </div>
+              </div>
             </div>
           </div>
 
@@ -376,12 +398,12 @@
           <div class="rounded-2xl border border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-800/40 p-3.5 space-y-3">
             <label class="flex items-center gap-2.5 cursor-pointer select-none">
               <input id="f-lent" type="checkbox" class="w-4 h-4 accent-sky-600 rounded" />
-              <span class="text-sm font-semibold text-stone-800 dark:text-stone-200">🤝 Lent to someone</span>
+              <span class="text-sm font-semibold text-stone-800 dark:text-stone-200">🤝 Lent to Someone</span>
             </label>
             <div id="f-lent-fields" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-2.5">
               <div>
                 <label for="f-lent-to" class="block text-[11px] font-bold uppercase tracking-wide text-stone-500 dark:text-stone-400 mb-1">
-                  Who has it?
+                  Borrower Name
                 </label>
                 <input
                   id="f-lent-to"
@@ -392,7 +414,7 @@
               </div>
               <div>
                 <label for="f-lent-date" class="block text-[11px] font-bold uppercase tracking-wide text-stone-500 dark:text-stone-400 mb-1">
-                  Date lent
+                  Date Lent
                 </label>
                 <input
                   id="f-lent-date"
@@ -403,15 +425,15 @@
             </div>
           </div>
 
-          <div class="space-y-2 pt-1">
+          <div class="space-y-2.5 pt-1">
             <label class="flex items-center gap-2.5 cursor-pointer select-none">
               <input id="f-pinned" type="checkbox" class="w-4 h-4 accent-amber-600 rounded" />
-              <span class="text-sm font-medium text-stone-700 dark:text-stone-300">📌 Pin to Home screen essentials</span>
+              <span class="text-sm font-medium text-stone-700 dark:text-stone-300">📌 Pin to Home Essentials</span>
             </label>
             <div class="flex items-center justify-between gap-2">
               <label class="flex items-center gap-2.5 cursor-pointer select-none">
                 <input id="f-private" type="checkbox" class="w-4 h-4 accent-stone-700 rounded" />
-                <span class="text-sm font-medium text-stone-700 dark:text-stone-300">🔒 Mark as Private (PIN lock)</span>
+                <span class="text-sm font-medium text-stone-700 dark:text-stone-300">🔒 Mark as Private (PIN Lock)</span>
               </label>
               <button id="f-pin-manage-btn" type="button" class="text-xs font-bold text-amber-700 dark:text-amber-400 hover:underline cursor-pointer shrink-0">
                 Set PIN
@@ -424,7 +446,7 @@
             type="submit"
             class="w-full rounded-2xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-sm py-3.5 shadow-sm transition cursor-pointer"
           >
-            Save Location
+            Save Item
           </button>
         </form>
       </div>
@@ -434,7 +456,7 @@
     <section id="view-more" class="hidden space-y-5">
       <div>
         <h1 class="text-xl font-extrabold">Rooms &amp; Settings</h1>
-        <p class="text-xs text-stone-500 dark:text-stone-400">Browse rooms, print QR labels, lock private items, or back up.</p>
+        <p class="text-xs text-stone-500 dark:text-stone-400">Browse rooms, print QR labels, manage PIN lock, or back up your list.</p>
       </div>
 
       <!-- Rooms Breakdown + QR Labels -->
@@ -449,7 +471,7 @@
       <!-- Custom Room Presets Manager -->
       <div class="bg-white dark:bg-stone-900 rounded-3xl border border-stone-200 dark:border-stone-800 p-5 shadow-sm space-y-3">
         <div>
-          <h2 class="text-sm font-bold text-stone-800 dark:text-stone-200">Custom Room / Box Presets</h2>
+          <h2 class="text-sm font-bold text-stone-800 dark:text-stone-200">Custom Room Presets</h2>
           <p class="text-xs text-stone-500 dark:text-stone-400 mt-0.5">Quick-tap chips shown when adding or moving items.</p>
         </div>
         <form id="preset-form" class="flex gap-2">
@@ -473,7 +495,7 @@
       <div class="bg-white dark:bg-stone-900 rounded-3xl border border-stone-200 dark:border-stone-800 p-5 shadow-sm space-y-3">
         <div>
           <h2 class="text-sm font-bold text-stone-800 dark:text-stone-200">🔔 Expiry Notifications</h2>
-          <p id="notif-status-text" class="text-xs text-stone-500 dark:text-stone-400 mt-0.5">Get notified when items are expiring within 30 days.</p>
+          <p id="notif-status-text" class="text-xs text-stone-500 dark:text-stone-400 mt-0.5">Get alerted when items are expiring within 30 days.</p>
         </div>
         <button id="notif-enable-btn" type="button" class="rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-3.5 py-2 transition cursor-pointer">
           Enable Notifications
@@ -482,11 +504,9 @@
 
       <!-- Private PIN Lock -->
       <div class="bg-white dark:bg-stone-900 rounded-3xl border border-stone-200 dark:border-stone-800 p-5 shadow-sm space-y-3">
-        <div class="flex items-center justify-between">
-          <div>
-            <h2 class="text-sm font-bold text-stone-800 dark:text-stone-200">🔒 Private Items PIN Lock</h2>
-            <p id="pin-status-text" class="text-xs text-stone-500 dark:text-stone-400 mt-0.5">No PIN set. Set a 4-digit PIN to hide private items.</p>
-          </div>
+        <div>
+          <h2 class="text-sm font-bold text-stone-800 dark:text-stone-200">🔒 Private Items PIN Lock</h2>
+          <p id="pin-status-text" class="text-xs text-stone-500 dark:text-stone-400 mt-0.5">No PIN set. Set a 4-digit PIN to hide private items.</p>
         </div>
         <div class="flex flex-wrap gap-2">
           <button id="pin-setup-btn" type="button" class="rounded-xl bg-stone-900 dark:bg-amber-600 hover:bg-stone-800 dark:hover:bg-amber-700 text-white text-xs font-bold px-3.5 py-2 transition cursor-pointer">
@@ -516,7 +536,7 @@
         <p id="backup-msg" class="hidden text-xs font-semibold"></p>
       </div>
 
-      <!-- Recently Deleted (Undo Trash) -->
+      <!-- Recently Deleted -->
       <div class="bg-white dark:bg-stone-900 rounded-3xl border border-stone-200 dark:border-stone-800 p-5 shadow-sm space-y-3">
         <div class="flex items-center justify-between">
           <div>
@@ -524,7 +544,7 @@
             <p class="text-xs text-stone-500 dark:text-stone-400 mt-0.5">Restore items deleted by mistake.</p>
           </div>
           <button id="clear-trash-btn" type="button" class="hidden text-xs font-semibold text-red-500 hover:underline cursor-pointer">
-            Empty
+            Empty Trash
           </button>
         </div>
         <ul id="trash-list" class="space-y-2"></ul>
@@ -559,7 +579,7 @@
         </div>
         <div>
           <label for="move-room" class="block text-xs font-bold uppercase tracking-wide text-stone-500 dark:text-stone-400 mb-1">
-            New Room / Box (optional)
+            New Room or Box (optional)
           </label>
           <input
             id="move-room"
@@ -624,10 +644,10 @@
       <p id="import-choice-desc" class="text-xs text-stone-600 dark:text-stone-300"></p>
       <div class="space-y-2">
         <button id="import-merge-btn" type="button" class="w-full rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold py-3 cursor-pointer">
-          🤝 Merge with My Existing Items
+          🤝 Merge with Existing Items
         </button>
         <button id="import-replace-btn" type="button" class="w-full rounded-xl bg-stone-200 dark:bg-stone-800 hover:bg-stone-300 dark:hover:bg-stone-700 text-stone-900 dark:text-stone-100 text-xs font-bold py-3 cursor-pointer">
-          🔄 Replace All Existing Items
+          🔄 Replace All Items
         </button>
       </div>
     </div>
@@ -691,7 +711,7 @@
         <h2 id="qr-modal-title" class="text-base font-extrabold">Room QR Label</h2>
         <button id="qr-close-btn" type="button" class="text-stone-400 hover:text-stone-700 dark:hover:text-stone-200 text-lg font-bold px-2 cursor-pointer">✕</button>
       </div>
-      <p class="text-xs text-stone-500 dark:text-stone-400">Stick this on a box or shelf—scanning opens all items in this room.</p>
+      <p class="text-xs text-stone-500 dark:text-stone-400">Stick this on a box or shelf—scanning opens all items inside it.</p>
       <div class="flex justify-center">
         <canvas id="qr-canvas" class="rounded-2xl border border-stone-200 bg-white p-2"></canvas>
       </div>
@@ -701,12 +721,17 @@
     </div>
   </div>
 
-  <!-- Fullscreen Photo Lightbox Modal -->
+  <!-- Fullscreen Photo Lightbox Modal with Visual Spot Pin -->
   <div id="photo-modal" class="hidden fixed inset-0 z-50 bg-black/85 flex flex-col items-center justify-center p-4">
     <button id="photo-modal-close" type="button" class="self-end mb-2 rounded-full bg-white/15 hover:bg-white/25 text-white text-xs font-bold px-3.5 py-1.5 cursor-pointer">
       ✕ Close
     </button>
-    <img id="photo-modal-img" alt="Saved item spot" class="max-w-full max-h-[75vh] rounded-2xl shadow-2xl object-contain" />
+    <div class="relative inline-block max-w-full">
+      <img id="photo-modal-img" alt="Saved item spot" class="block max-w-full max-h-[75vh] rounded-2xl shadow-2xl object-contain" />
+      <div id="photo-modal-pin" class="hidden spot-pin absolute w-8 h-8 rounded-full bg-amber-600 border-2 border-white shadow-xl flex items-center justify-center text-sm pointer-events-none">
+        📍
+      </div>
+    </div>
     <p id="photo-modal-caption" class="text-white text-xs font-semibold mt-3 text-center"></p>
   </div>
 
@@ -744,7 +769,6 @@
     const THEME_KEY = 'where_i_put_it_v2_theme';
 
     const DEFAULT_ITEMS = [];
-
     const DEFAULT_ROOMS = ['Documents', 'Living Room', 'Bedroom', 'Kitchen', 'Entryway', 'Car', 'Office'];
 
     function loadJson(key, fallback) {
@@ -777,8 +801,9 @@
     let editingId = null;
     let movingId = null;
     let currentPhotoData = '';
+    let currentPhotoPin = null; // { x: number, y: number }
     let pendingImportItems = null;
-    let pinMode = 'unlock'; // 'unlock' | 'set'
+    let pinMode = 'unlock';
     let activeQrRoom = '';
     let activeRemindEntry = null;
     let activeShareText = '';
@@ -831,7 +856,6 @@
       return { type: 'ok', label: '📅 Check ' + expiryStr, days: diffDays };
     }
 
-    // Voice recognition helper
     function startVoiceInput(onResult) {
       const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!SR) {
@@ -848,9 +872,7 @@
           const transcript = ev.results && ev.results[0] && ev.results[0][0] ? ev.results[0][0].transcript : '';
           if (transcript) onResult(transcript.trim());
         };
-        rec.onerror = function () {
-          showToast('Could not hear voice—try again.');
-        };
+        rec.onerror = function () { showToast('Could not hear voice—try again.'); };
         rec.start();
       } catch (e) {
         showToast('Voice input unavailable.');
@@ -889,7 +911,7 @@
     function shareItem(entry) {
       let text = '📦 ' + entry.name + '\n📍 Kept at: ' + entry.place;
       if (entry.room) text += ' (' + entry.room + ')';
-      if (entry.lentTo) text += '\n🤝 Currently lent to: ' + entry.lentTo + (entry.lentDate ? ' (' + entry.lentDate + ')' : '');
+      if (entry.lentTo) text += '\n🤝 Lent to: ' + entry.lentTo + (entry.lentDate ? ' (' + entry.lentDate + ')' : '');
       if (entry.note) text += '\n📝 Note: ' + entry.note;
 
       activeShareText = text;
@@ -923,9 +945,17 @@
       document.getElementById('move-modal').classList.add('hidden');
     }
 
-    function openPhotoModal(src, caption) {
+    function openPhotoModal(src, caption, pin) {
       document.getElementById('photo-modal-img').src = src;
       document.getElementById('photo-modal-caption').textContent = caption || '';
+      const pinEl = document.getElementById('photo-modal-pin');
+      if (pin && typeof pin.x === 'number' && typeof pin.y === 'number') {
+        pinEl.style.left = pin.x + '%';
+        pinEl.style.top = pin.y + '%';
+        pinEl.classList.remove('hidden');
+      } else {
+        pinEl.classList.add('hidden');
+      }
       document.getElementById('photo-modal').classList.remove('hidden');
     }
 
@@ -991,7 +1021,7 @@
         if (btnEl) btnEl.classList.add('hidden');
         if (promptEl) promptEl.classList.add('hidden');
       } else {
-        if (statusEl) statusEl.textContent = 'Get notified when items are expiring within 30 days.';
+        if (statusEl) statusEl.textContent = 'Get alerted when items are expiring within 30 days.';
         if (btnEl) btnEl.classList.remove('hidden');
         const hasExpiry = items.some(function (x) { return Boolean(x.expiry); });
         if (promptEl) promptEl.classList.toggle('hidden', !hasExpiry);
@@ -1139,14 +1169,21 @@
       if (entry.photo) {
         const thumbBtn = document.createElement('button');
         thumbBtn.type = 'button';
-        thumbBtn.className = 'shrink-0 rounded-xl overflow-hidden border border-stone-200 dark:border-stone-700 cursor-pointer';
+        thumbBtn.className = 'relative shrink-0 rounded-xl overflow-hidden border border-stone-200 dark:border-stone-700 cursor-pointer';
         const img = document.createElement('img');
         img.src = entry.photo;
         img.alt = entry.name;
         img.className = 'w-14 h-14 object-cover';
         thumbBtn.appendChild(img);
+        if (entry.photoPin && typeof entry.photoPin.x === 'number') {
+          const dot = document.createElement('span');
+          dot.className = 'absolute w-3 h-3 rounded-full bg-amber-500 border border-white shadow -translate-x-1/2 -translate-y-1/2 pointer-events-none';
+          dot.style.left = entry.photoPin.x + '%';
+          dot.style.top = entry.photoPin.y + '%';
+          thumbBtn.appendChild(dot);
+        }
         thumbBtn.addEventListener('click', function () {
-          openPhotoModal(entry.photo, entry.name + ' — ' + entry.place);
+          openPhotoModal(entry.photo, entry.name + ' — ' + entry.place, entry.photoPin);
         });
         leftGroup.appendChild(thumbBtn);
       }
@@ -1193,7 +1230,6 @@
       const metaRow = document.createElement('div');
       metaRow.className = 'flex flex-wrap items-center gap-2 mt-1.5';
 
-      // Quantity stepper if qty is set
       if (entry.qty !== undefined && entry.qty !== null && entry.qty !== '') {
         const qtyWrap = document.createElement('span');
         const qVal = Number(entry.qty);
@@ -1267,7 +1303,7 @@
       topRow.appendChild(pinBtn);
       li.appendChild(topRow);
 
-      // Action bar
+      // Standardized Action Bar
       const actionBar = document.createElement('div');
       actionBar.className = 'flex flex-wrap items-center justify-end gap-1.5 pt-2 border-t border-stone-100 dark:border-stone-800/80';
 
@@ -1527,7 +1563,6 @@
             document.getElementById('list-search-input').value = '';
             switchView('items');
           });
-
           row.appendChild(openBtn);
 
           if (roomName !== 'Untagged') {
@@ -1535,9 +1570,7 @@
             qrBtn.type = 'button';
             qrBtn.className = 'shrink-0 rounded-xl bg-white dark:bg-stone-700 border border-stone-200 dark:border-stone-600 px-2.5 py-1.5 text-[11px] font-bold text-stone-700 dark:text-stone-200 hover:border-amber-500 cursor-pointer';
             qrBtn.textContent = 'QR';
-            qrBtn.addEventListener('click', function () {
-              openQrModal(roomName);
-            });
+            qrBtn.addEventListener('click', function () { openQrModal(roomName); });
             row.appendChild(qrBtn);
           }
 
@@ -1545,7 +1578,6 @@
         });
       }
 
-      // Render presets manager
       const manageList = document.getElementById('presets-manage-list');
       manageList.innerHTML = '';
       roomPresets.forEach(function (roomName) {
@@ -1567,7 +1599,6 @@
         manageList.appendChild(pill);
       });
 
-      // PIN status
       const pinStatus = document.getElementById('pin-status-text');
       const pinSetupBtn = document.getElementById('pin-setup-btn');
       const pinRmBtn = document.getElementById('pin-remove-btn');
@@ -1584,7 +1615,6 @@
         pinRmBtn.classList.add('hidden');
       }
 
-      // Trash list
       const trashList = document.getElementById('trash-list');
       const trashEmpty = document.getElementById('trash-empty');
       const clearTrashBtn = document.getElementById('clear-trash-btn');
@@ -1629,8 +1659,23 @@
       renderRoomPresetChips('form-room-presets', 'f-room');
     }
 
-    function setPhotoPreview(dataUrl) {
+    function updatePhotoPinMarker() {
+      const marker = document.getElementById('f-photo-pin-marker');
+      const clearPinBtn = document.getElementById('f-photo-clear-pin');
+      if (currentPhotoData && currentPhotoPin) {
+        marker.style.left = currentPhotoPin.x + '%';
+        marker.style.top = currentPhotoPin.y + '%';
+        marker.classList.remove('hidden');
+        clearPinBtn.classList.remove('hidden');
+      } else {
+        marker.classList.add('hidden');
+        clearPinBtn.classList.add('hidden');
+      }
+    }
+
+    function setPhotoPreview(dataUrl, pin) {
       currentPhotoData = dataUrl || '';
+      currentPhotoPin = pin || null;
       const wrap = document.getElementById('f-photo-preview-wrap');
       const img = document.getElementById('f-photo-preview');
       const rmBtn = document.getElementById('f-photo-remove');
@@ -1643,16 +1688,17 @@
         wrap.classList.add('hidden');
         rmBtn.classList.add('hidden');
       }
+      updatePhotoPinMarker();
     }
 
     function resetForm() {
       editingId = null;
       document.getElementById('form-title').textContent = 'Add New Item';
-      document.getElementById('f-submit-btn').textContent = 'Save Location';
+      document.getElementById('f-submit-btn').textContent = 'Save Item';
       document.getElementById('form-cancel-btn').classList.add('hidden');
       document.getElementById('item-form').reset();
       document.getElementById('f-lent-fields').classList.add('hidden');
-      setPhotoPreview('');
+      setPhotoPreview('', null);
     }
 
     function startEdit(entry) {
@@ -1675,9 +1721,26 @@
       document.getElementById('f-lent-to').value = entry.lentTo || '';
       document.getElementById('f-lent-date').value = entry.lentDate || '';
 
-      setPhotoPreview(entry.photo || '');
+      setPhotoPreview(entry.photo || '', entry.photoPin || null);
       switchView('add', { keepEditing: true });
     }
+
+    // Tap-to-pin on photo stage
+    document.getElementById('f-photo-stage').addEventListener('click', function (e) {
+      if (!currentPhotoData) return;
+      const rect = this.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
+      const x = Math.max(4, Math.min(96, Math.round(((e.clientX - rect.left) / rect.width) * 100)));
+      const y = Math.max(4, Math.min(96, Math.round(((e.clientY - rect.top) / rect.height) * 100)));
+      currentPhotoPin = { x: x, y: y };
+      updatePhotoPinMarker();
+      showToast('Visual pin placed!');
+    });
+
+    document.getElementById('f-photo-clear-pin').addEventListener('click', function () {
+      currentPhotoPin = null;
+      updatePhotoPinMarker();
+    });
 
     // Voice buttons
     document.getElementById('home-voice-btn').addEventListener('click', function () {
@@ -1689,7 +1752,6 @@
         switchView('items');
       });
     });
-
     document.getElementById('list-voice-btn').addEventListener('click', function () {
       startVoiceInput(function (txt) {
         searchQuery = txt;
@@ -1698,11 +1760,9 @@
         renderItemsView();
       });
     });
-
     document.getElementById('f-name-voice-btn').addEventListener('click', function () {
       startVoiceInput(function (txt) { document.getElementById('f-name').value = txt; });
     });
-
     document.getElementById('f-place-voice-btn').addEventListener('click', function () {
       startVoiceInput(function (txt) { document.getElementById('f-place').value = txt; });
     });
@@ -1723,9 +1783,7 @@
       document.getElementById('f-photo').value = '';
       document.getElementById('f-photo').click();
     });
-
-    document.getElementById('f-photo-remove').addEventListener('click', function () { setPhotoPreview(''); });
-
+    document.getElementById('f-photo-remove').addEventListener('click', function () { setPhotoPreview('', null); });
     document.getElementById('f-photo').addEventListener('change', function (e) {
       const file = e.target.files && e.target.files[0];
       if (!file) return;
@@ -1744,7 +1802,7 @@
           canvas.width = w;
           canvas.height = h;
           canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-          setPhotoPreview(canvas.toDataURL('image/jpeg', 0.65));
+          setPhotoPreview(canvas.toDataURL('image/jpeg', 0.65), null);
         };
         img.src = ev.target.result;
       };
@@ -1783,6 +1841,7 @@
           target.lentTo = lentTo;
           target.lentDate = lentDate;
           target.photo = currentPhotoData;
+          target.photoPin = currentPhotoPin;
           target.date = 'Updated ' + today;
         }
         showToast('Item updated!');
@@ -1800,6 +1859,7 @@
           lentTo: lentTo,
           lentDate: lentDate,
           photo: currentPhotoData,
+          photoPin: currentPhotoPin,
           date: today
         });
         showToast('Saved "' + name + '"!');
@@ -1888,7 +1948,6 @@
       closeMoveModal();
       renderAll();
     });
-
     document.getElementById('move-close-btn').addEventListener('click', closeMoveModal);
     document.getElementById('move-cancel-btn').addEventListener('click', closeMoveModal);
     document.getElementById('photo-modal-close').addEventListener('click', closePhotoModal);
@@ -1910,9 +1969,7 @@
     document.getElementById('pin-setup-btn').addEventListener('click', function () { openPinModal('set'); });
     document.getElementById('f-pin-manage-btn').addEventListener('click', function () { openPinModal('set'); });
     document.getElementById('f-private').addEventListener('change', function (e) {
-      if (e.target.checked && !savedPin) {
-        openPinModal('set');
-      }
+      if (e.target.checked && !savedPin) openPinModal('set');
     });
     document.getElementById('pin-remove-btn').addEventListener('click', function () {
       savedPin = '';
@@ -1950,7 +2007,7 @@
       }
     });
 
-    // QR modal listeners
+    // Remind & Notification listeners
     document.getElementById('remind-close-btn').addEventListener('click', closeRemindModal);
     document.getElementById('remind-modal').addEventListener('click', function (e) {
       if (e.target.id === 'remind-modal') closeRemindModal();
@@ -2001,6 +2058,8 @@
     });
     document.getElementById('notif-enable-btn').addEventListener('click', function () { requestAndCheckNotifications(true); });
     document.getElementById('home-notif-prompt').addEventListener('click', function () { requestAndCheckNotifications(true); });
+
+    // QR modal listeners
     document.getElementById('qr-close-btn').addEventListener('click', closeQrModal);
     document.getElementById('qr-save-btn').addEventListener('click', function () {
       try {
@@ -2030,7 +2089,6 @@
       }
       document.getElementById('preset-input').value = '';
     });
-
     document.getElementById('clear-trash-btn').addEventListener('click', function () {
       trashItems = [];
       saveTrash();
@@ -2118,6 +2176,7 @@
           lentTo: x.lentTo ? String(x.lentTo) : '',
           lentDate: x.lentDate ? String(x.lentDate) : '',
           photo: x.photo ? String(x.photo) : '',
+          photoPin: x.photoPin && typeof x.photoPin.x === 'number' ? x.photoPin : null,
           isPrivate: Boolean(x.isPrivate),
           pinned: Boolean(x.pinned),
           date: x.date ? String(x.date) : ''
@@ -2135,7 +2194,7 @@
           if (!Array.isArray(parsed)) throw new Error('Invalid');
           pendingImportItems = normalizeImported(parsed);
           document.getElementById('import-choice-desc').textContent =
-            'Found ' + pendingImportItems.length + ' items in backup. Do you want to merge them with your current list or replace everything?';
+            'Found ' + pendingImportItems.length + ' items in backup. Merge with your current list or replace everything?';
           document.getElementById('import-choice-modal').classList.remove('hidden');
         } catch (err) {
           backupMsg.textContent = 'Invalid backup file.';
@@ -2208,6 +2267,7 @@
         if (roomParam) {
           activeFilter = roomParam;
           switchView('items');
+          requestAndCheckNotifications(false);
           return;
         }
       } catch (e) {}
