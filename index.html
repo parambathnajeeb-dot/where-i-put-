@@ -29,7 +29,7 @@
       <div class="flex items-center gap-2 min-w-0">
         <span class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-amber-600 text-white text-sm font-bold shadow-sm shrink-0">📦</span>
         <span class="font-extrabold tracking-tight text-base sm:text-lg truncate">Where Did I Put It?</span>
-        <span class="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-stone-200 dark:bg-stone-800 text-stone-600 dark:text-stone-400 shrink-0">v5.0</span>
+        <span class="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-stone-200 dark:bg-stone-800 text-stone-600 dark:text-stone-400 shrink-0">v5.1</span>
       </div>
       <div class="flex items-center gap-1.5 shrink-0">
         <button
@@ -396,10 +396,15 @@
               <input id="f-pinned" type="checkbox" class="w-4 h-4 accent-amber-600 rounded" />
               <span class="text-sm font-medium text-stone-700 dark:text-stone-300">📌 Pin to Home screen essentials</span>
             </label>
-            <label class="flex items-center gap-2.5 cursor-pointer select-none">
-              <input id="f-private" type="checkbox" class="w-4 h-4 accent-stone-700 rounded" />
-              <span class="text-sm font-medium text-stone-700 dark:text-stone-300">🔒 Mark as Private (protected by PIN)</span>
-            </label>
+            <div class="flex items-center justify-between gap-2">
+              <label class="flex items-center gap-2.5 cursor-pointer select-none">
+                <input id="f-private" type="checkbox" class="w-4 h-4 accent-stone-700 rounded" />
+                <span class="text-sm font-medium text-stone-700 dark:text-stone-300">🔒 Mark as Private (PIN lock)</span>
+              </label>
+              <button id="f-pin-manage-btn" type="button" class="text-xs font-bold text-amber-700 dark:text-amber-400 hover:underline cursor-pointer shrink-0">
+                Set PIN
+              </button>
+            </div>
           </div>
 
           <button
@@ -689,11 +694,7 @@
     const PIN_KEY = 'where_i_put_it_v5_pin';
     const THEME_KEY = 'where_i_put_it_v2_theme';
 
-    const DEFAULT_ITEMS = [
-      { id: 1, name: 'Passport & Documents', place: 'Top drawer of bedroom desk', room: 'Documents', note: 'Inside the blue zip folder', pinned: true, date: 'Starter' },
-      { id: 2, name: 'Spare House Keys', place: 'Ceramic bowl by front door', room: 'Entryway', note: '', pinned: true, date: 'Starter' },
-      { id: 3, name: 'TV Remote Batteries', place: 'Left kitchen drawer', room: 'Kitchen', note: 'AA & AAA pack', qty: 4, pinned: false, date: 'Starter' }
-    ];
+    const DEFAULT_ITEMS = [];
 
     const DEFAULT_ROOMS = ['Documents', 'Living Room', 'Bedroom', 'Kitchen', 'Entryway', 'Car', 'Office'];
 
@@ -1412,13 +1413,16 @@
       const pinStatus = document.getElementById('pin-status-text');
       const pinSetupBtn = document.getElementById('pin-setup-btn');
       const pinRmBtn = document.getElementById('pin-remove-btn');
+      const formPinBtn = document.getElementById('f-pin-manage-btn');
       if (savedPin) {
         pinStatus.textContent = 'PIN is active. Private items are protected.';
         pinSetupBtn.textContent = 'Change PIN';
+        if (formPinBtn) formPinBtn.textContent = 'Change PIN';
         pinRmBtn.classList.remove('hidden');
       } else {
         pinStatus.textContent = 'No PIN set. Set a 4-digit PIN to hide private items.';
         pinSetupBtn.textContent = 'Set 4-Digit PIN';
+        if (formPinBtn) formPinBtn.textContent = 'Set PIN';
         pinRmBtn.classList.add('hidden');
       }
 
@@ -1745,6 +1749,12 @@
     });
     document.getElementById('items-locked-banner').addEventListener('click', function () { openPinModal('unlock'); });
     document.getElementById('pin-setup-btn').addEventListener('click', function () { openPinModal('set'); });
+    document.getElementById('f-pin-manage-btn').addEventListener('click', function () { openPinModal('set'); });
+    document.getElementById('f-private').addEventListener('change', function (e) {
+      if (e.target.checked && !savedPin) {
+        openPinModal('set');
+      }
+    });
     document.getElementById('pin-remove-btn').addEventListener('click', function () {
       savedPin = '';
       isUnlocked = true;
