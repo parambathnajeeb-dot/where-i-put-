@@ -1,4 +1,4 @@
-const CACHE_NAME = 'where-i-put-it-v4-1';
+const CACHE_NAME = 'where-i-put-it-v5';
 const LOCAL_ASSETS = [
   './',
   './index.html',
@@ -11,6 +11,7 @@ self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       cache.add('https://cdn.tailwindcss.com/3.4.17').catch(() => {});
+      cache.add('https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js').catch(() => {});
       return cache.addAll(LOCAL_ASSETS);
     })
   );
@@ -29,7 +30,6 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
 
-  // Network-first for HTML pages so updates show up immediately when online
   if (event.request.mode === 'navigate' || event.request.destination === 'document') {
     event.respondWith(
       fetch(event.request)
@@ -45,7 +45,6 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Cache-first for icons, CSS, and scripts
   event.respondWith(
     caches.match(event.request, { ignoreSearch: true }).then((cached) => {
       const networkFetch = fetch(event.request)

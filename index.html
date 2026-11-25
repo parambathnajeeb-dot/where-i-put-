@@ -11,6 +11,7 @@
   <script>
     tailwind.config = { darkMode: 'class' };
   </script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -24,18 +25,28 @@
 
   <!-- Top App Bar -->
   <header class="sticky top-0 z-30 bg-stone-100/90 dark:bg-stone-950/90 backdrop-blur border-b border-stone-200/80 dark:border-stone-800">
-    <div class="max-w-lg mx-auto px-4 h-14 flex items-center justify-between">
-      <div class="flex items-center gap-2">
-        <span class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-amber-600 text-white text-sm font-bold shadow-sm">📦</span>
-        <span class="font-extrabold tracking-tight text-base sm:text-lg">Where Did I Put It?</span><span class="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-stone-200 dark:bg-stone-800 text-stone-600 dark:text-stone-400">v4.1</span>
+    <div class="max-w-lg mx-auto px-4 h-14 flex items-center justify-between gap-2">
+      <div class="flex items-center gap-2 min-w-0">
+        <span class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-amber-600 text-white text-sm font-bold shadow-sm shrink-0">📦</span>
+        <span class="font-extrabold tracking-tight text-base sm:text-lg truncate">Where Did I Put It?</span>
+        <span class="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-stone-200 dark:bg-stone-800 text-stone-600 dark:text-stone-400 shrink-0">v5.0</span>
       </div>
-      <button
-        id="theme-btn"
-        type="button"
-        class="rounded-full border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-900 px-3 py-1 text-xs font-semibold text-stone-700 dark:text-stone-200 hover:bg-stone-50 dark:hover:bg-stone-800 transition cursor-pointer"
-      >
-        🌙 Dark
-      </button>
+      <div class="flex items-center gap-1.5 shrink-0">
+        <button
+          id="header-lock-btn"
+          type="button"
+          class="hidden rounded-full border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-900 px-2.5 py-1 text-xs font-semibold text-stone-700 dark:text-stone-200 hover:bg-stone-50 dark:hover:bg-stone-800 transition cursor-pointer"
+        >
+          🔒 Locked
+        </button>
+        <button
+          id="theme-btn"
+          type="button"
+          class="rounded-full border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-900 px-3 py-1 text-xs font-semibold text-stone-700 dark:text-stone-200 hover:bg-stone-50 dark:hover:bg-stone-800 transition cursor-pointer"
+        >
+          🌙 Dark
+        </button>
+      </div>
     </div>
   </header>
 
@@ -47,7 +58,7 @@
       <div class="bg-gradient-to-br from-amber-600 to-amber-700 text-white rounded-3xl p-5 shadow-md">
         <p class="text-amber-100 text-xs font-semibold uppercase tracking-wider">Home Organizer</p>
         <h1 class="text-xl sm:text-2xl font-extrabold mt-1">Find anything in seconds</h1>
-        <p class="text-amber-100 text-sm mt-1">Keep track of keys, documents, lent items, and check-up dates.</p>
+        <p class="text-amber-100 text-sm mt-1">Track keys, documents, lent items, stock counts, and check-up dates.</p>
 
         <!-- Primary Action Buttons -->
         <div class="grid grid-cols-2 gap-2.5 mt-4">
@@ -70,16 +81,26 @@
         </div>
       </div>
 
-      <!-- Quick Search Bar -->
+      <!-- Quick Search Bar with Voice -->
       <div class="bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 p-3 shadow-sm">
-        <div class="relative">
-          <input
-            id="home-search-input"
-            type="search"
-            placeholder="Quick search (e.g., Passport, Kitchen, Ali)..."
-            class="w-full rounded-xl bg-stone-100 dark:bg-stone-800 pl-9 pr-3.5 py-2.5 text-sm text-stone-900 dark:text-stone-100 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-amber-500"
-          />
-          <span class="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 text-sm pointer-events-none">🔍</span>
+        <div class="relative flex items-center gap-2">
+          <div class="relative flex-1">
+            <input
+              id="home-search-input"
+              type="search"
+              placeholder="Quick search (e.g., Passport, Kitchen)..."
+              class="w-full rounded-xl bg-stone-100 dark:bg-stone-800 pl-9 pr-3 py-2.5 text-sm text-stone-900 dark:text-stone-100 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-amber-500"
+            />
+            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 text-sm pointer-events-none">🔍</span>
+          </div>
+          <button
+            id="home-voice-btn"
+            type="button"
+            title="Voice search"
+            class="shrink-0 w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-900/40 hover:bg-amber-200 dark:hover:bg-amber-900/70 text-amber-800 dark:text-amber-300 flex items-center justify-center text-base transition cursor-pointer"
+          >
+            🎤
+          </button>
         </div>
       </div>
 
@@ -111,7 +132,7 @@
       >
         <div class="flex items-center justify-between gap-2">
           <div>
-            <p id="home-expiry-title" class="text-xs font-bold text-red-800 dark:text-red-300">⚠️ Check-up / Expiry Alert</p>
+            <p class="text-xs font-bold text-red-800 dark:text-red-300">⚠️ Check-up / Expiry Alert</p>
             <p id="home-expiry-desc" class="text-xs text-red-700 dark:text-red-400 mt-0.5"></p>
           </div>
           <span class="text-xs font-bold text-red-700 dark:text-red-300 shrink-0">View →</span>
@@ -135,30 +156,62 @@
 
     <!-- ==================== SAVED ITEMS SCREEN ==================== -->
     <section id="view-items" class="hidden space-y-4">
-      <div class="flex items-center justify-between">
+      <div class="flex items-center justify-between gap-2">
         <div>
           <h1 class="text-xl font-extrabold">Saved Items</h1>
           <p id="items-subtitle" class="text-xs text-stone-500 dark:text-stone-400">0 items stored on this device</p>
         </div>
-        <button
-          id="items-add-btn"
-          type="button"
-          class="rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-3.5 py-2 shadow-sm transition cursor-pointer"
-        >
-          + Add Item
-        </button>
+        <div class="flex items-center gap-2">
+          <select
+            id="sort-select"
+            aria-label="Sort items"
+            class="rounded-xl border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-900 text-xs font-semibold px-2.5 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500 cursor-pointer"
+          >
+            <option value="pinned">Sort: Pinned</option>
+            <option value="newest">Sort: Newest</option>
+            <option value="az">Sort: A–Z</option>
+            <option value="room">Sort: Room</option>
+          </select>
+          <button
+            id="items-add-btn"
+            type="button"
+            class="rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-3.5 py-2 shadow-sm transition cursor-pointer"
+          >
+            + Add
+          </button>
+        </div>
       </div>
 
-      <!-- Search + Status/Room Filter Chips -->
+      <!-- Hidden Private Items Notice -->
+      <button
+        id="items-locked-banner"
+        type="button"
+        class="hidden w-full flex items-center justify-between rounded-2xl bg-stone-200/80 dark:bg-stone-800/80 border border-stone-300 dark:border-stone-700 px-3.5 py-2.5 text-xs font-semibold text-stone-700 dark:text-stone-200 cursor-pointer"
+      >
+        <span id="items-locked-text">🔒 Private items are hidden</span>
+        <span class="text-amber-700 dark:text-amber-400 font-bold">Unlock →</span>
+      </button>
+
+      <!-- Search + Voice + Room Filter Chips -->
       <div class="space-y-2.5">
-        <div class="relative">
-          <input
-            id="list-search-input"
-            type="search"
-            placeholder="Search by item, place, room, person, or note..."
-            class="w-full rounded-xl border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-900 pl-9 pr-3.5 py-2.5 text-sm text-stone-900 dark:text-stone-100 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-amber-500"
-          />
-          <span class="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 text-sm pointer-events-none">🔍</span>
+        <div class="flex items-center gap-2">
+          <div class="relative flex-1">
+            <input
+              id="list-search-input"
+              type="search"
+              placeholder="Search item, place, room, person..."
+              class="w-full rounded-xl border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-900 pl-9 pr-3 py-2.5 text-sm text-stone-900 dark:text-stone-100 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-amber-500"
+            />
+            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 text-sm pointer-events-none">🔍</span>
+          </div>
+          <button
+            id="list-voice-btn"
+            type="button"
+            title="Voice search"
+            class="shrink-0 w-10 h-10 rounded-xl border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-900 hover:bg-amber-50 dark:hover:bg-stone-800 text-base flex items-center justify-center transition cursor-pointer"
+          >
+            🎤
+          </button>
         </div>
         <div id="room-filter-bar" class="flex flex-wrap gap-1.5"></div>
       </div>
@@ -188,39 +241,84 @@
             <label for="f-name" class="block text-xs font-bold uppercase tracking-wide text-stone-500 dark:text-stone-400 mb-1.5">
               What is it? *
             </label>
-            <input
-              id="f-name"
-              type="text"
-              required
-              placeholder="e.g., Spare house keys"
-              class="w-full rounded-xl border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-800 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
-            />
+            <div class="flex gap-2">
+              <input
+                id="f-name"
+                type="text"
+                required
+                placeholder="e.g., Spare house keys"
+                class="flex-1 min-w-0 rounded-xl border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-800 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+              />
+              <button
+                id="f-name-voice-btn"
+                type="button"
+                title="Speak item name"
+                class="shrink-0 w-10 rounded-xl border border-stone-300 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 hover:bg-amber-50 dark:hover:bg-stone-700 text-base flex items-center justify-center cursor-pointer"
+              >
+                🎤
+              </button>
+            </div>
           </div>
 
           <div>
             <label for="f-place" class="block text-xs font-bold uppercase tracking-wide text-stone-500 dark:text-stone-400 mb-1.5">
               Where did you put it? *
             </label>
-            <input
-              id="f-place"
-              type="text"
-              required
-              placeholder="e.g., Top shelf, blue box"
-              class="w-full rounded-xl border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-800 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
-            />
+            <div class="flex gap-2">
+              <input
+                id="f-place"
+                type="text"
+                required
+                placeholder="e.g., Top shelf, blue box"
+                class="flex-1 min-w-0 rounded-xl border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-800 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+              />
+              <button
+                id="f-place-voice-btn"
+                type="button"
+                title="Speak location"
+                class="shrink-0 w-10 rounded-xl border border-stone-300 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 hover:bg-amber-50 dark:hover:bg-stone-700 text-base flex items-center justify-center cursor-pointer"
+              >
+                🎤
+              </button>
+            </div>
           </div>
 
           <div>
             <label for="f-room" class="block text-xs font-bold uppercase tracking-wide text-stone-500 dark:text-stone-400 mb-1.5">
-              Room or Tag (tap a preset or type your own)
+              Room or Box Tag (tap a preset or type your own)
             </label>
             <input
               id="f-room"
               type="text"
-              placeholder="e.g., Kitchen, Bedroom, Car"
+              placeholder="e.g., Kitchen, Bedroom, Attic Box 1"
               class="w-full rounded-xl border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-800 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
             />
             <div id="form-room-presets" class="flex flex-wrap gap-1.5 mt-2"></div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label for="f-qty" class="block text-xs font-bold uppercase tracking-wide text-stone-500 dark:text-stone-400 mb-1.5">
+                Quantity (optional)
+              </label>
+              <input
+                id="f-qty"
+                type="number"
+                min="0"
+                placeholder="e.g., 4"
+                class="w-full rounded-xl border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-800 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+              />
+            </div>
+            <div>
+              <label for="f-expiry" class="block text-xs font-bold uppercase tracking-wide text-stone-500 dark:text-stone-400 mb-1.5">
+                Expiry / Check Date
+              </label>
+              <input
+                id="f-expiry"
+                type="date"
+                class="w-full rounded-xl border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-800 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+              />
+            </div>
           </div>
 
           <div>
@@ -262,18 +360,6 @@
             </div>
           </div>
 
-          <!-- Expiry / Check-up Date -->
-          <div>
-            <label for="f-expiry" class="block text-xs font-bold uppercase tracking-wide text-stone-500 dark:text-stone-400 mb-1.5">
-              Expiry or Check-up Date (optional)
-            </label>
-            <input
-              id="f-expiry"
-              type="date"
-              class="w-full rounded-xl border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-800 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
-            />
-          </div>
-
           <!-- Lent to Someone Toggle -->
           <div class="rounded-2xl border border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-800/40 p-3.5 space-y-3">
             <label class="flex items-center gap-2.5 cursor-pointer select-none">
@@ -305,10 +391,16 @@
             </div>
           </div>
 
-          <label class="flex items-center gap-2.5 pt-1 cursor-pointer select-none">
-            <input id="f-pinned" type="checkbox" class="w-4 h-4 accent-amber-600 rounded" />
-            <span class="text-sm font-medium text-stone-700 dark:text-stone-300">📌 Pin to Home screen essentials</span>
-          </label>
+          <div class="space-y-2 pt-1">
+            <label class="flex items-center gap-2.5 cursor-pointer select-none">
+              <input id="f-pinned" type="checkbox" class="w-4 h-4 accent-amber-600 rounded" />
+              <span class="text-sm font-medium text-stone-700 dark:text-stone-300">📌 Pin to Home screen essentials</span>
+            </label>
+            <label class="flex items-center gap-2.5 cursor-pointer select-none">
+              <input id="f-private" type="checkbox" class="w-4 h-4 accent-stone-700 rounded" />
+              <span class="text-sm font-medium text-stone-700 dark:text-stone-300">🔒 Mark as Private (protected by PIN)</span>
+            </label>
+          </div>
 
           <button
             id="f-submit-btn"
@@ -321,30 +413,33 @@
       </div>
     </section>
 
-    <!-- ==================== ROOMS & BACKUP SCREEN ==================== -->
+    <!-- ==================== ROOMS & SETTINGS SCREEN ==================== -->
     <section id="view-more" class="hidden space-y-5">
       <div>
-        <h1 class="text-xl font-extrabold">Rooms &amp; Backup</h1>
-        <p class="text-xs text-stone-500 dark:text-stone-400">Browse by room, manage presets, or back up your saved list.</p>
+        <h1 class="text-xl font-extrabold">Rooms &amp; Settings</h1>
+        <p class="text-xs text-stone-500 dark:text-stone-400">Browse rooms, print QR labels, lock private items, or back up.</p>
       </div>
 
-      <!-- Rooms Breakdown -->
+      <!-- Rooms Breakdown + QR Labels -->
       <div class="bg-white dark:bg-stone-900 rounded-3xl border border-stone-200 dark:border-stone-800 p-4 shadow-sm">
-        <h2 class="text-sm font-bold text-stone-800 dark:text-stone-200 mb-3">Items by Room</h2>
-        <div id="rooms-summary" class="grid grid-cols-2 gap-2"></div>
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="text-sm font-bold text-stone-800 dark:text-stone-200">Items by Room &amp; Box QR</h2>
+          <span class="text-[11px] text-stone-400">Tap QR for label</span>
+        </div>
+        <div id="rooms-summary" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
       </div>
 
       <!-- Custom Room Presets Manager -->
       <div class="bg-white dark:bg-stone-900 rounded-3xl border border-stone-200 dark:border-stone-800 p-5 shadow-sm space-y-3">
         <div>
-          <h2 class="text-sm font-bold text-stone-800 dark:text-stone-200">Custom Room Presets</h2>
-          <p class="text-xs text-stone-500 dark:text-stone-400 mt-0.5">Quick-tap room chips shown when adding or moving items.</p>
+          <h2 class="text-sm font-bold text-stone-800 dark:text-stone-200">Custom Room / Box Presets</h2>
+          <p class="text-xs text-stone-500 dark:text-stone-400 mt-0.5">Quick-tap chips shown when adding or moving items.</p>
         </div>
         <form id="preset-form" class="flex gap-2">
           <input
             id="preset-input"
             type="text"
-            placeholder="Add room (e.g., Balcony, Garage)"
+            placeholder="Add room or box (e.g., Attic Box 1)"
             class="flex-1 min-w-0 rounded-xl border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
           />
           <button
@@ -357,22 +452,55 @@
         <div id="presets-manage-list" class="flex flex-wrap gap-1.5"></div>
       </div>
 
-      <!-- Backup & Restore -->
+      <!-- Private PIN Lock -->
+      <div class="bg-white dark:bg-stone-900 rounded-3xl border border-stone-200 dark:border-stone-800 p-5 shadow-sm space-y-3">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-sm font-bold text-stone-800 dark:text-stone-200">🔒 Private Items PIN Lock</h2>
+            <p id="pin-status-text" class="text-xs text-stone-500 dark:text-stone-400 mt-0.5">No PIN set. Set a 4-digit PIN to hide private items.</p>
+          </div>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <button id="pin-setup-btn" type="button" class="rounded-xl bg-stone-900 dark:bg-amber-600 hover:bg-stone-800 dark:hover:bg-amber-700 text-white text-xs font-bold px-3.5 py-2 transition cursor-pointer">
+            Set 4-Digit PIN
+          </button>
+          <button id="pin-remove-btn" type="button" class="hidden rounded-xl bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400 text-xs font-bold px-3.5 py-2 transition cursor-pointer">
+            Remove PIN
+          </button>
+        </div>
+      </div>
+
+      <!-- Backup & Family Merge -->
       <div class="bg-white dark:bg-stone-900 rounded-3xl border border-stone-200 dark:border-stone-800 p-5 shadow-sm space-y-3">
         <div>
-          <h2 class="text-sm font-bold text-stone-800 dark:text-stone-200">Backup &amp; Restore</h2>
-          <p class="text-xs text-stone-500 dark:text-stone-400 mt-0.5">Save a copy of your items (including photos) or restore from a `.json` backup.</p>
+          <h2 class="text-sm font-bold text-stone-800 dark:text-stone-200">Backup &amp; Family Merge</h2>
+          <p class="text-xs text-stone-500 dark:text-stone-400 mt-0.5">Export a `.json` backup, replace your list, or merge with a family member's list.</p>
         </div>
         <div class="grid grid-cols-2 gap-2.5">
           <button id="export-btn" type="button" class="rounded-xl bg-stone-200 dark:bg-stone-800 hover:bg-stone-300 dark:hover:bg-stone-700 text-stone-900 dark:text-stone-100 text-xs font-bold py-2.5 px-3 transition cursor-pointer">
             Export Backup
           </button>
           <button id="import-btn" type="button" class="rounded-xl bg-stone-900 dark:bg-amber-600 hover:bg-stone-800 dark:hover:bg-amber-700 text-white text-xs font-bold py-2.5 px-3 transition cursor-pointer">
-            Import Backup
+            Import / Merge
           </button>
         </div>
         <input id="import-file" type="file" accept=".json,application/json" class="hidden" />
         <p id="backup-msg" class="hidden text-xs font-semibold"></p>
+      </div>
+
+      <!-- Recently Deleted (Undo Trash) -->
+      <div class="bg-white dark:bg-stone-900 rounded-3xl border border-stone-200 dark:border-stone-800 p-5 shadow-sm space-y-3">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-sm font-bold text-stone-800 dark:text-stone-200">🗑️ Recently Deleted</h2>
+            <p class="text-xs text-stone-500 dark:text-stone-400 mt-0.5">Restore items deleted by mistake.</p>
+          </div>
+          <button id="clear-trash-btn" type="button" class="hidden text-xs font-semibold text-red-500 hover:underline cursor-pointer">
+            Empty
+          </button>
+        </div>
+        <ul id="trash-list" class="space-y-2"></ul>
+        <p id="trash-empty" class="text-xs text-stone-400">Trash is empty.</p>
       </div>
     </section>
 
@@ -403,7 +531,7 @@
         </div>
         <div>
           <label for="move-room" class="block text-xs font-bold uppercase tracking-wide text-stone-500 dark:text-stone-400 mb-1">
-            New Room (optional)
+            New Room / Box (optional)
           </label>
           <input
             id="move-room"
@@ -448,13 +576,75 @@
             📋 Copy Text
           </button>
           <button id="share-native-btn" type="button" class="rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold py-2.5 cursor-pointer">
-            📱 Share Photo &amp; Text
+            📷 Share Photo &amp; Text
           </button>
         </div>
         <button id="share-save-photo-btn" type="button" class="hidden w-full rounded-xl border border-stone-300 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 hover:bg-stone-100 dark:hover:bg-stone-700 text-stone-800 dark:text-stone-200 text-xs font-bold py-2.5 cursor-pointer">
           💾 Save Photo to Phone
         </button>
       </div>
+    </div>
+  </div>
+
+  <!-- Import / Merge Choice Modal -->
+  <div id="import-choice-modal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="w-full max-w-sm bg-white dark:bg-stone-900 rounded-3xl border border-stone-200 dark:border-stone-800 p-5 shadow-xl space-y-4">
+      <div class="flex items-center justify-between">
+        <h2 class="text-base font-extrabold">Import Backup</h2>
+        <button id="import-choice-close" type="button" class="text-stone-400 hover:text-stone-700 dark:hover:text-stone-200 text-lg font-bold px-2 cursor-pointer">✕</button>
+      </div>
+      <p id="import-choice-desc" class="text-xs text-stone-600 dark:text-stone-300"></p>
+      <div class="space-y-2">
+        <button id="import-merge-btn" type="button" class="w-full rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold py-3 cursor-pointer">
+          🤝 Merge with My Existing Items
+        </button>
+        <button id="import-replace-btn" type="button" class="w-full rounded-xl bg-stone-200 dark:bg-stone-800 hover:bg-stone-300 dark:hover:bg-stone-700 text-stone-900 dark:text-stone-100 text-xs font-bold py-3 cursor-pointer">
+          🔄 Replace All Existing Items
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PIN Modal -->
+  <div id="pin-modal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="w-full max-w-xs bg-white dark:bg-stone-900 rounded-3xl border border-stone-200 dark:border-stone-800 p-5 shadow-xl space-y-4">
+      <div class="flex items-center justify-between">
+        <h2 id="pin-modal-title" class="text-base font-extrabold">Enter 4-Digit PIN</h2>
+        <button id="pin-modal-close" type="button" class="text-stone-400 hover:text-stone-700 dark:hover:text-stone-200 text-lg font-bold px-2 cursor-pointer">✕</button>
+      </div>
+      <form id="pin-form" class="space-y-3">
+        <input
+          id="pin-input"
+          type="password"
+          inputmode="numeric"
+          maxlength="4"
+          pattern="[0-9]{4}"
+          required
+          placeholder="••••"
+          class="w-full text-center tracking-[0.6em] text-xl font-extrabold rounded-xl border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-800 px-3 py-3 focus:outline-none focus:ring-2 focus:ring-amber-500"
+        />
+        <p id="pin-error" class="hidden text-xs font-semibold text-red-600 text-center"></p>
+        <button type="submit" class="w-full rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold py-3 cursor-pointer">
+          Confirm
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- QR Label Modal -->
+  <div id="qr-modal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="w-full max-w-xs bg-white dark:bg-stone-900 rounded-3xl border border-stone-200 dark:border-stone-800 p-5 shadow-xl space-y-4 text-center">
+      <div class="flex items-center justify-between">
+        <h2 id="qr-modal-title" class="text-base font-extrabold">Room QR Label</h2>
+        <button id="qr-close-btn" type="button" class="text-stone-400 hover:text-stone-700 dark:hover:text-stone-200 text-lg font-bold px-2 cursor-pointer">✕</button>
+      </div>
+      <p class="text-xs text-stone-500 dark:text-stone-400">Stick this on a box or shelf—scanning opens all items in this room.</p>
+      <div class="flex justify-center">
+        <canvas id="qr-canvas" class="rounded-2xl border border-stone-200 bg-white p-2"></canvas>
+      </div>
+      <button id="qr-save-btn" type="button" class="w-full rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold py-2.5 cursor-pointer">
+        💾 Save Label Image
+      </button>
     </div>
   </div>
 
@@ -495,47 +685,54 @@
   <script>
     const STORAGE_KEY = 'where_i_put_it_v2_items';
     const ROOMS_KEY = 'where_i_put_it_v2_rooms';
+    const TRASH_KEY = 'where_i_put_it_v5_trash';
+    const PIN_KEY = 'where_i_put_it_v5_pin';
     const THEME_KEY = 'where_i_put_it_v2_theme';
 
     const DEFAULT_ITEMS = [
       { id: 1, name: 'Passport & Documents', place: 'Top drawer of bedroom desk', room: 'Documents', note: 'Inside the blue zip folder', pinned: true, date: 'Starter' },
       { id: 2, name: 'Spare House Keys', place: 'Ceramic bowl by front door', room: 'Entryway', note: '', pinned: true, date: 'Starter' },
-      { id: 3, name: 'TV Remote Batteries', place: 'Left kitchen drawer', room: 'Kitchen', note: 'AA & AAA pack', pinned: false, date: 'Starter' }
+      { id: 3, name: 'TV Remote Batteries', place: 'Left kitchen drawer', room: 'Kitchen', note: 'AA & AAA pack', qty: 4, pinned: false, date: 'Starter' }
     ];
 
     const DEFAULT_ROOMS = ['Documents', 'Living Room', 'Bedroom', 'Kitchen', 'Entryway', 'Car', 'Office'];
 
-    function loadItems() {
+    function loadJson(key, fallback) {
       try {
-        const raw = localStorage.getItem(STORAGE_KEY);
+        const raw = localStorage.getItem(key);
         if (raw) {
           const parsed = JSON.parse(raw);
           if (Array.isArray(parsed)) return parsed;
         }
       } catch (e) {}
-      return DEFAULT_ITEMS.slice();
+      return fallback.slice();
     }
 
-    function loadRooms() {
-      try {
-        const raw = localStorage.getItem(ROOMS_KEY);
-        if (raw) {
-          const parsed = JSON.parse(raw);
-          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-        }
-      } catch (e) {}
-      return DEFAULT_ROOMS.slice();
+    function loadPin() {
+      try { return localStorage.getItem(PIN_KEY) || ''; } catch (e) { return ''; }
     }
 
-    let items = loadItems();
-    let roomPresets = loadRooms();
+    let items = loadJson(STORAGE_KEY, DEFAULT_ITEMS);
+    let roomPresets = loadJson(ROOMS_KEY, DEFAULT_ROOMS);
+    if (roomPresets.length === 0) roomPresets = DEFAULT_ROOMS.slice();
+    let trashItems = loadJson(TRASH_KEY, []);
+    let savedPin = loadPin();
+    let isUnlocked = !savedPin;
+
     let nextId = items.reduce(function (m, x) { return Math.max(m, x.id || 0); }, 0) + 1;
     let currentView = 'home';
     let searchQuery = '';
-    let activeFilter = 'All'; // 'All', 'Lent', 'Expiring', or a room name
+    let activeFilter = 'All';
+    let sortBy = 'pinned';
     let editingId = null;
     let movingId = null;
     let currentPhotoData = '';
+    let pendingImportItems = null;
+    let pinMode = 'unlock'; // 'unlock' | 'set'
+    let activeQrRoom = '';
+    let activeShareText = '';
+    let activeShareTitle = '';
+    let activeSharePhoto = '';
     let confirmDeleteId = null;
     let confirmTimer = null;
     let toastTimer = null;
@@ -551,9 +748,11 @@
     }
 
     function saveRooms() {
-      try {
-        localStorage.setItem(ROOMS_KEY, JSON.stringify(roomPresets));
-      } catch (e) {}
+      try { localStorage.setItem(ROOMS_KEY, JSON.stringify(roomPresets)); } catch (e) {}
+    }
+
+    function saveTrash() {
+      try { localStorage.setItem(TRASH_KEY, JSON.stringify(trashItems.slice(0, 10))); } catch (e) {}
     }
 
     function showToast(text) {
@@ -562,6 +761,10 @@
       el.classList.remove('hidden');
       if (toastTimer) clearTimeout(toastTimer);
       toastTimer = setTimeout(function () { el.classList.add('hidden'); }, 2800);
+    }
+
+    function isVisibleItem(entry) {
+      return !entry.isPrivate || !savedPin || isUnlocked;
     }
 
     function getExpiryStatus(expiryStr) {
@@ -577,9 +780,31 @@
       return { type: 'ok', label: '📅 Check ' + expiryStr, days: diffDays };
     }
 
-    let activeShareText = '';
-    let activeShareTitle = '';
-    let activeSharePhoto = '';
+    // Voice recognition helper
+    function startVoiceInput(onResult) {
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SR) {
+        showToast('Voice input works on Android Chrome.');
+        return;
+      }
+      try {
+        const rec = new SR();
+        rec.lang = 'en-IN';
+        rec.interimResults = false;
+        rec.maxAlternatives = 1;
+        showToast('Listening... speak now');
+        rec.onresult = function (ev) {
+          const transcript = ev.results && ev.results[0] && ev.results[0][0] ? ev.results[0][0].transcript : '';
+          if (transcript) onResult(transcript.trim());
+        };
+        rec.onerror = function () {
+          showToast('Could not hear voice—try again.');
+        };
+        rec.start();
+      } catch (e) {
+        showToast('Voice input unavailable.');
+      }
+    }
 
     function dataUrlToFile(dataUrl, filename) {
       const parts = dataUrl.split(',');
@@ -588,9 +813,7 @@
       const bstr = atob(parts[1]);
       let n = bstr.length;
       const u8arr = new Uint8Array(n);
-      while (n--) {
-        u8arr[n] = bstr.charCodeAt(n);
-      }
+      while (n--) u8arr[n] = bstr.charCodeAt(n);
       return new File([u8arr], filename, { type: mime });
     }
 
@@ -623,6 +846,7 @@
       activeSharePhoto = entry.photo || '';
       document.getElementById('share-preview-text').textContent = text;
       document.getElementById('share-wa-link').href = 'https://wa.me/?text=' + encodeURIComponent(text);
+
       const nativeBtn = document.getElementById('share-native-btn');
       nativeBtn.classList.toggle('hidden', !navigator.share);
       nativeBtn.textContent = activeSharePhoto ? '📷 Share Photo & Text' : '📱 More Apps';
@@ -657,6 +881,61 @@
     function closePhotoModal() {
       document.getElementById('photo-modal').classList.add('hidden');
       document.getElementById('photo-modal-img').src = '';
+    }
+
+    function openPinModal(mode) {
+      pinMode = mode;
+      document.getElementById('pin-modal-title').textContent = mode === 'set' ? 'Set 4-Digit PIN' : 'Unlock Private Items';
+      document.getElementById('pin-input').value = '';
+      document.getElementById('pin-error').classList.add('hidden');
+      document.getElementById('pin-modal').classList.remove('hidden');
+      setTimeout(function () { document.getElementById('pin-input').focus(); }, 50);
+    }
+
+    function closePinModal() {
+      document.getElementById('pin-modal').classList.add('hidden');
+    }
+
+    function openQrModal(roomName) {
+      activeQrRoom = roomName;
+      document.getElementById('qr-modal-title').textContent = 'QR Label: ' + roomName;
+      const baseUrl = window.location.protocol.startsWith('http')
+        ? window.location.origin + window.location.pathname
+        : 'https://parambathnajeeb-dot.github.io/where-i-put-it/';
+      const targetUrl = baseUrl + '?room=' + encodeURIComponent(roomName);
+      const canvas = document.getElementById('qr-canvas');
+      const ctx = canvas.getContext('2d');
+      const size = 220;
+      canvas.width = size;
+      canvas.height = size + 32;
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      if (typeof window.qrcode === 'function') {
+        const qr = window.qrcode(0, 'M');
+        qr.addData(targetUrl);
+        qr.make();
+        const count = qr.getModuleCount();
+        const pad = 16;
+        const cell = (size - pad * 2) / count;
+        ctx.fillStyle = '#1c1917';
+        for (let r = 0; r < count; r++) {
+          for (let c = 0; c < count; c++) {
+            if (qr.isDark(r, c)) {
+              ctx.fillRect(Math.floor(pad + c * cell), Math.floor(pad + r * cell), Math.ceil(cell), Math.ceil(cell));
+            }
+          }
+        }
+      }
+      ctx.fillStyle = '#1c1917';
+      ctx.font = 'bold 14px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('📦 ' + roomName, size / 2, size + 16);
+      document.getElementById('qr-modal').classList.remove('hidden');
+    }
+
+    function closeQrModal() {
+      document.getElementById('qr-modal').classList.add('hidden');
     }
 
     function renderRoomPresetChips(containerId, targetInputId) {
@@ -730,7 +1009,7 @@
 
       const title = document.createElement('h3');
       title.className = 'font-bold text-sm sm:text-base text-stone-900 dark:text-stone-100 break-words';
-      title.textContent = entry.name;
+      title.textContent = (entry.isPrivate ? '🔒 ' : '') + entry.name;
       titleRow.appendChild(title);
 
       if (entry.room) {
@@ -764,6 +1043,43 @@
       const metaRow = document.createElement('div');
       metaRow.className = 'flex flex-wrap items-center gap-2 mt-1.5';
 
+      // Quantity stepper if qty is set
+      if (entry.qty !== undefined && entry.qty !== null && entry.qty !== '') {
+        const qtyWrap = document.createElement('span');
+        const qVal = Number(entry.qty);
+        qtyWrap.className = qVal <= 1
+          ? 'inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300'
+          : 'inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300';
+
+        const minusBtn = document.createElement('button');
+        minusBtn.type = 'button';
+        minusBtn.className = 'px-1 font-extrabold hover:text-amber-600 cursor-pointer';
+        minusBtn.textContent = '−';
+        minusBtn.addEventListener('click', function () {
+          entry.qty = Math.max(0, Number(entry.qty) - 1);
+          saveItems();
+          renderAll();
+        });
+
+        const qtyText = document.createElement('span');
+        qtyText.textContent = (qVal <= 1 ? 'Low: ' : 'Qty: ') + qVal;
+
+        const plusBtn = document.createElement('button');
+        plusBtn.type = 'button';
+        plusBtn.className = 'px-1 font-extrabold hover:text-amber-600 cursor-pointer';
+        plusBtn.textContent = '+';
+        plusBtn.addEventListener('click', function () {
+          entry.qty = Number(entry.qty) + 1;
+          saveItems();
+          renderAll();
+        });
+
+        qtyWrap.appendChild(minusBtn);
+        qtyWrap.appendChild(qtyText);
+        qtyWrap.appendChild(plusBtn);
+        metaRow.appendChild(qtyWrap);
+      }
+
       const exp = getExpiryStatus(entry.expiry);
       if (exp) {
         const expBadge = document.createElement('span');
@@ -783,10 +1099,7 @@
         metaRow.appendChild(dt);
       }
 
-      if (metaRow.children.length > 0) {
-        info.appendChild(metaRow);
-      }
-
+      if (metaRow.children.length > 0) info.appendChild(metaRow);
       leftGroup.appendChild(info);
 
       const pinBtn = document.createElement('button');
@@ -827,25 +1140,19 @@
       shareBtn.type = 'button';
       shareBtn.className = 'text-xs font-semibold text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 px-2.5 py-1 rounded-lg transition cursor-pointer';
       shareBtn.textContent = '📤 Share';
-      shareBtn.addEventListener('click', function () {
-        shareItem(entry);
-      });
+      shareBtn.addEventListener('click', function () { shareItem(entry); });
 
       const moveBtn = document.createElement('button');
       moveBtn.type = 'button';
       moveBtn.className = 'text-xs font-semibold text-amber-700 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/40 px-2.5 py-1 rounded-lg transition cursor-pointer';
       moveBtn.textContent = '📦 Move';
-      moveBtn.addEventListener('click', function () {
-        openMoveModal(entry);
-      });
+      moveBtn.addEventListener('click', function () { openMoveModal(entry); });
 
       const editBtn = document.createElement('button');
       editBtn.type = 'button';
       editBtn.className = 'text-xs font-semibold text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 px-2.5 py-1 rounded-lg transition cursor-pointer';
       editBtn.textContent = 'Edit';
-      editBtn.addEventListener('click', function () {
-        startEdit(entry);
-      });
+      editBtn.addEventListener('click', function () { startEdit(entry); });
 
       const delBtn = document.createElement('button');
       delBtn.type = 'button';
@@ -858,18 +1165,18 @@
         if (confirmDeleteId !== entry.id) {
           confirmDeleteId = entry.id;
           if (confirmTimer) clearTimeout(confirmTimer);
-          confirmTimer = setTimeout(function () {
-            confirmDeleteId = null;
-            renderAll();
-          }, 3000);
+          confirmTimer = setTimeout(function () { confirmDeleteId = null; renderAll(); }, 3000);
           renderAll();
           return;
         }
         confirmDeleteId = null;
+        trashItems.unshift(entry);
+        trashItems = trashItems.slice(0, 10);
         items = items.filter(function (x) { return x.id !== entry.id; });
         saveItems();
+        saveTrash();
         renderAll();
-        showToast('Item removed');
+        showToast('Moved to Recently Deleted');
       });
 
       actionBar.appendChild(shareBtn);
@@ -881,16 +1188,27 @@
       return li;
     }
 
+    function renderHeaderLock() {
+      const lockBtn = document.getElementById('header-lock-btn');
+      if (!savedPin) {
+        lockBtn.classList.add('hidden');
+      } else {
+        lockBtn.classList.remove('hidden');
+        lockBtn.textContent = isUnlocked ? '🔓 Lock' : '🔒 Unlock';
+      }
+    }
+
     function renderHome() {
-      const pinnedItems = items.filter(function (x) { return x.pinned; });
-      const lentItems = items.filter(function (x) { return Boolean(x.lentTo); });
-      const uniqueRooms = new Set(items.map(function (x) { return (x.room || '').trim(); }).filter(Boolean));
-      const dueItems = items.filter(function (x) {
+      const visible = items.filter(isVisibleItem);
+      const pinnedItems = visible.filter(function (x) { return x.pinned; });
+      const lentItems = visible.filter(function (x) { return Boolean(x.lentTo); });
+      const uniqueRooms = new Set(visible.map(function (x) { return (x.room || '').trim(); }).filter(Boolean));
+      const dueItems = visible.filter(function (x) {
         const s = getExpiryStatus(x.expiry);
         return s && (s.type === 'expired' || s.type === 'soon');
       });
 
-      document.getElementById('stat-total').textContent = items.length;
+      document.getElementById('stat-total').textContent = visible.length;
       document.getElementById('stat-pinned').textContent = pinnedItems.length;
       document.getElementById('stat-lent').textContent = lentItems.length;
       document.getElementById('stat-rooms').textContent = uniqueRooms.size;
@@ -920,14 +1238,28 @@
     }
 
     function renderItemsView() {
+      const visible = items.filter(isVisibleItem);
+      const hiddenPrivateCount = items.length - visible.length;
+      const lockedBanner = document.getElementById('items-locked-banner');
+      if (hiddenPrivateCount > 0) {
+        lockedBanner.classList.remove('hidden');
+        document.getElementById('items-locked-text').textContent =
+          '🔒 ' + hiddenPrivateCount + ' private ' + (hiddenPrivateCount === 1 ? 'item is' : 'items are') + ' hidden';
+      } else {
+        lockedBanner.classList.add('hidden');
+      }
+
       const filters = ['All'];
-      if (items.some(function (x) { return Boolean(x.lentTo); })) filters.push('Lent');
-      if (items.some(function (x) {
+      if (visible.some(function (x) { return Boolean(x.lentTo); })) filters.push('Lent');
+      if (visible.some(function (x) {
         const s = getExpiryStatus(x.expiry);
         return s && (s.type === 'expired' || s.type === 'soon');
       })) filters.push('Expiring');
+      if (visible.some(function (x) { return x.qty !== undefined && x.qty !== '' && Number(x.qty) <= 1; })) {
+        filters.push('LowStock');
+      }
 
-      items.forEach(function (x) {
+      visible.forEach(function (x) {
         if (x.room && x.room.trim() && filters.indexOf(x.room.trim()) === -1) {
           filters.push(x.room.trim());
         }
@@ -943,7 +1275,7 @@
         btn.className = isActive
           ? 'px-3 py-1 rounded-full text-xs font-bold bg-amber-600 text-white cursor-pointer'
           : 'px-3 py-1 rounded-full text-xs font-medium bg-stone-200 dark:bg-stone-800 text-stone-700 dark:text-stone-300 hover:bg-stone-300 dark:hover:bg-stone-700 cursor-pointer';
-        btn.textContent = f === 'Lent' ? '🤝 Lent Out' : f === 'Expiring' ? '⏳ Due Soon' : f;
+        btn.textContent = f === 'Lent' ? '🤝 Lent Out' : f === 'Expiring' ? '⏳ Due Soon' : f === 'LowStock' ? '📉 Low Stock' : f;
         btn.addEventListener('click', function () {
           activeFilter = f;
           renderItemsView();
@@ -952,24 +1284,31 @@
       });
 
       const q = searchQuery.trim().toLowerCase();
-      const filtered = items
-        .filter(function (entry) {
-          let matchesFilter = true;
-          if (activeFilter === 'Lent') {
-            matchesFilter = Boolean(entry.lentTo);
-          } else if (activeFilter === 'Expiring') {
-            const s = getExpiryStatus(entry.expiry);
-            matchesFilter = Boolean(s && (s.type === 'expired' || s.type === 'soon'));
-          } else if (activeFilter !== 'All') {
-            matchesFilter = entry.room === activeFilter;
-          }
-          const hay = (entry.name + ' ' + entry.place + ' ' + (entry.room || '') + ' ' + (entry.note || '') + ' ' + (entry.lentTo || '')).toLowerCase();
-          return matchesFilter && (!q || hay.includes(q));
-        })
-        .sort(function (a, b) { return (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0); });
+      const filtered = visible.filter(function (entry) {
+        let matchesFilter = true;
+        if (activeFilter === 'Lent') {
+          matchesFilter = Boolean(entry.lentTo);
+        } else if (activeFilter === 'Expiring') {
+          const s = getExpiryStatus(entry.expiry);
+          matchesFilter = Boolean(s && (s.type === 'expired' || s.type === 'soon'));
+        } else if (activeFilter === 'LowStock') {
+          matchesFilter = entry.qty !== undefined && entry.qty !== '' && Number(entry.qty) <= 1;
+        } else if (activeFilter !== 'All') {
+          matchesFilter = entry.room === activeFilter;
+        }
+        const hay = (entry.name + ' ' + entry.place + ' ' + (entry.room || '') + ' ' + (entry.note || '') + ' ' + (entry.lentTo || '')).toLowerCase();
+        return matchesFilter && (!q || hay.includes(q));
+      });
+
+      filtered.sort(function (a, b) {
+        if (sortBy === 'az') return a.name.localeCompare(b.name);
+        if (sortBy === 'room') return (a.room || 'zzz').localeCompare(b.room || 'zzz');
+        if (sortBy === 'newest') return (b.id || 0) - (a.id || 0);
+        return (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0);
+      });
 
       document.getElementById('items-subtitle').textContent =
-        filtered.length + ' of ' + items.length + (items.length === 1 ? ' item' : ' items') + ' shown';
+        filtered.length + ' of ' + visible.length + (visible.length === 1 ? ' item' : ' items') + ' shown';
 
       const listEl = document.getElementById('items-list');
       const emptyEl = document.getElementById('items-empty');
@@ -979,8 +1318,8 @@
 
       if (filtered.length === 0) {
         emptyEl.classList.remove('hidden');
-        if (items.length === 0) {
-          emptyMsg.textContent = 'No items saved yet. Tap "+ Add Item" to save your first spot!';
+        if (visible.length === 0) {
+          emptyMsg.textContent = 'No items saved yet. Tap "+ Add" to save your first spot!';
           clearBtn.classList.add('hidden');
         } else {
           emptyMsg.textContent = 'No matching items found.';
@@ -995,8 +1334,9 @@
     }
 
     function renderMoreView() {
+      const visible = items.filter(isVisibleItem);
       const counts = {};
-      items.forEach(function (x) {
+      visible.forEach(function (x) {
         const r = (x.room || '').trim() || 'Untagged';
         counts[r] = (counts[r] || 0) + 1;
       });
@@ -1008,24 +1348,41 @@
         container.innerHTML = '<p class="col-span-2 text-xs text-stone-500">Add items with rooms to see your breakdown here.</p>';
       } else {
         keys.sort().forEach(function (roomName) {
-          const card = document.createElement('button');
-          card.type = 'button';
-          card.className = 'rounded-2xl bg-stone-100 dark:bg-stone-800 hover:bg-amber-50 dark:hover:bg-stone-700 p-3 text-left transition cursor-pointer';
+          const row = document.createElement('div');
+          row.className = 'flex items-center justify-between gap-2 rounded-2xl bg-stone-100 dark:bg-stone-800 p-3';
+
+          const openBtn = document.createElement('button');
+          openBtn.type = 'button';
+          openBtn.className = 'text-left min-w-0 flex-1 cursor-pointer';
           const nameEl = document.createElement('p');
           nameEl.className = 'font-bold text-sm text-stone-900 dark:text-stone-100 truncate';
           nameEl.textContent = roomName;
           const countEl = document.createElement('p');
           countEl.className = 'text-xs text-stone-500 dark:text-stone-400 mt-0.5';
           countEl.textContent = counts[roomName] + (counts[roomName] === 1 ? ' item' : ' items');
-          card.appendChild(nameEl);
-          card.appendChild(countEl);
-          card.addEventListener('click', function () {
+          openBtn.appendChild(nameEl);
+          openBtn.appendChild(countEl);
+          openBtn.addEventListener('click', function () {
             activeFilter = roomName === 'Untagged' ? 'All' : roomName;
             searchQuery = '';
             document.getElementById('list-search-input').value = '';
             switchView('items');
           });
-          container.appendChild(card);
+
+          row.appendChild(openBtn);
+
+          if (roomName !== 'Untagged') {
+            const qrBtn = document.createElement('button');
+            qrBtn.type = 'button';
+            qrBtn.className = 'shrink-0 rounded-xl bg-white dark:bg-stone-700 border border-stone-200 dark:border-stone-600 px-2.5 py-1.5 text-[11px] font-bold text-stone-700 dark:text-stone-200 hover:border-amber-500 cursor-pointer';
+            qrBtn.textContent = 'QR';
+            qrBtn.addEventListener('click', function () {
+              openQrModal(roomName);
+            });
+            row.appendChild(qrBtn);
+          }
+
+          container.appendChild(row);
         });
       }
 
@@ -1041,7 +1398,6 @@
         rm.type = 'button';
         rm.className = 'text-stone-400 hover:text-red-600 font-bold cursor-pointer';
         rm.textContent = '✕';
-        rm.title = 'Remove preset';
         rm.addEventListener('click', function () {
           roomPresets = roomPresets.filter(function (r) { return r !== roomName; });
           saveRooms();
@@ -1051,9 +1407,59 @@
         pill.appendChild(rm);
         manageList.appendChild(pill);
       });
+
+      // PIN status
+      const pinStatus = document.getElementById('pin-status-text');
+      const pinSetupBtn = document.getElementById('pin-setup-btn');
+      const pinRmBtn = document.getElementById('pin-remove-btn');
+      if (savedPin) {
+        pinStatus.textContent = 'PIN is active. Private items are protected.';
+        pinSetupBtn.textContent = 'Change PIN';
+        pinRmBtn.classList.remove('hidden');
+      } else {
+        pinStatus.textContent = 'No PIN set. Set a 4-digit PIN to hide private items.';
+        pinSetupBtn.textContent = 'Set 4-Digit PIN';
+        pinRmBtn.classList.add('hidden');
+      }
+
+      // Trash list
+      const trashList = document.getElementById('trash-list');
+      const trashEmpty = document.getElementById('trash-empty');
+      const clearTrashBtn = document.getElementById('clear-trash-btn');
+      trashList.innerHTML = '';
+      if (trashItems.length === 0) {
+        trashEmpty.classList.remove('hidden');
+        clearTrashBtn.classList.add('hidden');
+      } else {
+        trashEmpty.classList.add('hidden');
+        clearTrashBtn.classList.remove('hidden');
+        trashItems.forEach(function (entry, idx) {
+          const li = document.createElement('li');
+          li.className = 'flex items-center justify-between gap-2 rounded-xl bg-stone-50 dark:bg-stone-800/70 px-3 py-2 text-xs';
+          const info = document.createElement('span');
+          info.className = 'truncate font-medium text-stone-700 dark:text-stone-300';
+          info.textContent = entry.name + ' (' + entry.place + ')';
+          const restoreBtn = document.createElement('button');
+          restoreBtn.type = 'button';
+          restoreBtn.className = 'shrink-0 font-bold text-amber-700 dark:text-amber-400 hover:underline cursor-pointer';
+          restoreBtn.textContent = 'Restore';
+          restoreBtn.addEventListener('click', function () {
+            const restored = trashItems.splice(idx, 1)[0];
+            items.unshift(restored);
+            saveItems();
+            saveTrash();
+            renderAll();
+            showToast('Restored "' + restored.name + '"!');
+          });
+          li.appendChild(info);
+          li.appendChild(restoreBtn);
+          trashList.appendChild(li);
+        });
+      }
     }
 
     function renderAll() {
+      renderHeaderLock();
       renderHome();
       renderItemsView();
       renderMoreView();
@@ -1094,9 +1500,11 @@
       document.getElementById('f-name').value = entry.name;
       document.getElementById('f-place').value = entry.place;
       document.getElementById('f-room').value = entry.room || '';
+      document.getElementById('f-qty').value = (entry.qty !== undefined && entry.qty !== null) ? entry.qty : '';
       document.getElementById('f-note').value = entry.note || '';
       document.getElementById('f-expiry').value = entry.expiry || '';
       document.getElementById('f-pinned').checked = Boolean(entry.pinned);
+      document.getElementById('f-private').checked = Boolean(entry.isPrivate);
 
       const isLent = Boolean(entry.lentTo);
       document.getElementById('f-lent').checked = isLent;
@@ -1108,16 +1516,42 @@
       switchView('add', { keepEditing: true });
     }
 
+    // Voice buttons
+    document.getElementById('home-voice-btn').addEventListener('click', function () {
+      startVoiceInput(function (txt) {
+        searchQuery = txt;
+        document.getElementById('home-search-input').value = txt;
+        document.getElementById('list-search-input').value = txt;
+        activeFilter = 'All';
+        switchView('items');
+      });
+    });
+
+    document.getElementById('list-voice-btn').addEventListener('click', function () {
+      startVoiceInput(function (txt) {
+        searchQuery = txt;
+        document.getElementById('home-search-input').value = txt;
+        document.getElementById('list-search-input').value = txt;
+        renderItemsView();
+      });
+    });
+
+    document.getElementById('f-name-voice-btn').addEventListener('click', function () {
+      startVoiceInput(function (txt) { document.getElementById('f-name').value = txt; });
+    });
+
+    document.getElementById('f-place-voice-btn').addEventListener('click', function () {
+      startVoiceInput(function (txt) { document.getElementById('f-place').value = txt; });
+    });
+
     // Lent checkbox toggle
     document.getElementById('f-lent').addEventListener('change', function (e) {
       const checked = e.target.checked;
       document.getElementById('f-lent-fields').classList.toggle('hidden', !checked);
       if (checked && !document.getElementById('f-lent-date').value) {
         const now = new Date();
-        const yyyy = now.getFullYear();
-        const mm = String(now.getMonth() + 1).padStart(2, '0');
-        const dd = String(now.getDate()).padStart(2, '0');
-        document.getElementById('f-lent-date').value = yyyy + '-' + mm + '-' + dd;
+        document.getElementById('f-lent-date').value =
+          now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
       }
     });
 
@@ -1127,9 +1561,7 @@
       document.getElementById('f-photo').click();
     });
 
-    document.getElementById('f-photo-remove').addEventListener('click', function () {
-      setPhotoPreview('');
-    });
+    document.getElementById('f-photo-remove').addEventListener('click', function () { setPhotoPreview(''); });
 
     document.getElementById('f-photo').addEventListener('change', function (e) {
       const file = e.target.files && e.target.files[0];
@@ -1142,19 +1574,13 @@
           let w = img.width;
           let h = img.height;
           if (w > maxDim || h > maxDim) {
-            if (w > h) {
-              h = Math.round((h * maxDim) / w);
-              w = maxDim;
-            } else {
-              w = Math.round((w * maxDim) / h);
-              h = maxDim;
-            }
+            if (w > h) { h = Math.round((h * maxDim) / w); w = maxDim; }
+            else { w = Math.round((w * maxDim) / h); h = maxDim; }
           }
           const canvas = document.createElement('canvas');
           canvas.width = w;
           canvas.height = h;
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0, w, h);
+          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
           setPhotoPreview(canvas.toDataURL('image/jpeg', 0.65));
         };
         img.src = ev.target.result;
@@ -1168,9 +1594,12 @@
       const name = document.getElementById('f-name').value.trim();
       const place = document.getElementById('f-place').value.trim();
       const room = document.getElementById('f-room').value.trim();
+      const qtyRaw = document.getElementById('f-qty').value.trim();
+      const qty = qtyRaw === '' ? '' : Math.max(0, Number(qtyRaw));
       const note = document.getElementById('f-note').value.trim();
       const expiry = document.getElementById('f-expiry').value;
       const pinned = document.getElementById('f-pinned').checked;
+      const isPrivate = document.getElementById('f-private').checked;
       const isLent = document.getElementById('f-lent').checked;
       const lentTo = isLent ? document.getElementById('f-lent-to').value.trim() : '';
       const lentDate = isLent && lentTo ? document.getElementById('f-lent-date').value : '';
@@ -1183,9 +1612,11 @@
           target.name = name;
           target.place = place;
           target.room = room;
+          target.qty = qty;
           target.note = note;
           target.expiry = expiry;
           target.pinned = pinned;
+          target.isPrivate = isPrivate;
           target.lentTo = lentTo;
           target.lentDate = lentDate;
           target.photo = currentPhotoData;
@@ -1198,9 +1629,11 @@
           name: name,
           place: place,
           room: room,
+          qty: qty,
           note: note,
           expiry: expiry,
           pinned: pinned,
+          isPrivate: isPrivate,
           lentTo: lentTo,
           lentDate: lentDate,
           photo: currentPhotoData,
@@ -1217,6 +1650,55 @@
     document.getElementById('form-cancel-btn').addEventListener('click', function () {
       resetForm();
       switchView('items');
+    });
+
+    // Share modal listeners
+    document.getElementById('share-close-btn').addEventListener('click', closeShareModal);
+    document.getElementById('share-modal').addEventListener('click', function (e) {
+      if (e.target.id === 'share-modal') closeShareModal();
+    });
+    document.getElementById('share-copy-btn').addEventListener('click', function () {
+      copyTextFallback(activeShareText);
+      closeShareModal();
+    });
+    document.getElementById('share-save-photo-btn').addEventListener('click', function () {
+      if (!activeSharePhoto) return;
+      try {
+        const a = document.createElement('a');
+        a.href = activeSharePhoto;
+        a.download = (activeShareTitle || 'item').replace(/[^a-z0-9]/gi, '_').toLowerCase() + '.jpg';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        showToast('Photo saved!');
+      } catch (e) {
+        showToast('Could not save photo');
+      }
+    });
+    document.getElementById('share-native-btn').addEventListener('click', function () {
+      if (navigator.share) {
+        if (activeSharePhoto && navigator.canShare) {
+          try {
+            const file = dataUrlToFile(activeSharePhoto, 'where-i-put-it.jpg');
+            if (navigator.canShare({ files: [file] })) {
+              navigator.share({ files: [file], text: activeShareText }).catch(function (err) {
+                if (err && err.name === 'AbortError') return;
+                navigator.share({ files: [file] }).catch(function () {
+                  showToast('Photo share blocked—use Save Photo or Copy Text');
+                });
+              });
+              closeShareModal();
+              return;
+            }
+          } catch (e) {}
+        }
+        navigator.share({ title: activeShareTitle, text: activeShareText }).catch(function (err) {
+          if (err && err.name !== 'AbortError') copyTextFallback(activeShareText);
+        });
+      } else {
+        copyTextFallback(activeShareText);
+      }
+      closeShareModal();
     });
 
     // Move modal
@@ -1244,54 +1726,6 @@
       renderAll();
     });
 
-    document.getElementById('share-close-btn').addEventListener('click', closeShareModal);
-    document.getElementById('share-modal').addEventListener('click', function (e) {
-      if (e.target.id === 'share-modal') closeShareModal();
-    });
-    document.getElementById('share-copy-btn').addEventListener('click', function () {
-      copyTextFallback(activeShareText);
-      closeShareModal();
-    });
-    document.getElementById('share-save-photo-btn').addEventListener('click', function () {
-      if (!activeSharePhoto) return;
-      try {
-        const a = document.createElement('a');
-        a.href = activeSharePhoto;
-        a.download = (activeShareTitle || 'item').replace(/[^a-z0-9]/gi, '_').toLowerCase() + '.jpg';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        showToast('Photo saved!');
-      } catch (e) {
-        showToast('Could not save photo');
-      }
-    });
-
-    document.getElementById('share-native-btn').addEventListener('click', function () {
-      if (navigator.share) {
-        if (activeSharePhoto && navigator.canShare) {
-          try {
-            const file = dataUrlToFile(activeSharePhoto, 'where-i-put-it.jpg');
-            if (navigator.canShare({ files: [file] })) {
-              navigator.share({ files: [file], text: activeShareText }).catch(function (err) {
-                if (err && err.name === 'AbortError') return;
-                navigator.share({ files: [file] }).catch(function () {
-                  showToast('Photo share blocked—use Save Photo or Copy Text');
-                });
-              });
-              closeShareModal();
-              return;
-            }
-          } catch (e) {}
-        }
-        navigator.share({ title: activeShareTitle, text: activeShareText }).catch(function (err) {
-          if (err && err.name !== 'AbortError') copyTextFallback(activeShareText);
-        });
-      } else {
-        copyTextFallback(activeShareText);
-      }
-      closeShareModal();
-    });
     document.getElementById('move-close-btn').addEventListener('click', closeMoveModal);
     document.getElementById('move-cancel-btn').addEventListener('click', closeMoveModal);
     document.getElementById('photo-modal-close').addEventListener('click', closePhotoModal);
@@ -1299,7 +1733,72 @@
       if (e.target.id === 'photo-modal') closePhotoModal();
     });
 
-    // Presets form
+    // PIN listeners
+    document.getElementById('header-lock-btn').addEventListener('click', function () {
+      if (isUnlocked) {
+        isUnlocked = false;
+        renderAll();
+        showToast('Private items locked');
+      } else {
+        openPinModal('unlock');
+      }
+    });
+    document.getElementById('items-locked-banner').addEventListener('click', function () { openPinModal('unlock'); });
+    document.getElementById('pin-setup-btn').addEventListener('click', function () { openPinModal('set'); });
+    document.getElementById('pin-remove-btn').addEventListener('click', function () {
+      savedPin = '';
+      isUnlocked = true;
+      try { localStorage.removeItem(PIN_KEY); } catch (e) {}
+      renderAll();
+      showToast('PIN removed');
+    });
+    document.getElementById('pin-modal-close').addEventListener('click', closePinModal);
+    document.getElementById('pin-form').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const val = document.getElementById('pin-input').value.trim();
+      if (!/^\d{4}$/.test(val)) {
+        document.getElementById('pin-error').textContent = 'Please enter exactly 4 digits.';
+        document.getElementById('pin-error').classList.remove('hidden');
+        return;
+      }
+      if (pinMode === 'set') {
+        savedPin = val;
+        isUnlocked = true;
+        try { localStorage.setItem(PIN_KEY, val); } catch (e) {}
+        closePinModal();
+        renderAll();
+        showToast('4-digit PIN saved!');
+      } else {
+        if (val === savedPin) {
+          isUnlocked = true;
+          closePinModal();
+          renderAll();
+          showToast('Private items unlocked');
+        } else {
+          document.getElementById('pin-error').textContent = 'Incorrect PIN. Try again.';
+          document.getElementById('pin-error').classList.remove('hidden');
+        }
+      }
+    });
+
+    // QR modal listeners
+    document.getElementById('qr-close-btn').addEventListener('click', closeQrModal);
+    document.getElementById('qr-save-btn').addEventListener('click', function () {
+      try {
+        const canvas = document.getElementById('qr-canvas');
+        const a = document.createElement('a');
+        a.href = canvas.toDataURL('image/png');
+        a.download = 'qr-' + (activeQrRoom || 'room').replace(/[^a-z0-9]/gi, '_').toLowerCase() + '.png';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        showToast('QR label saved!');
+      } catch (e) {
+        showToast('Could not save QR label');
+      }
+    });
+
+    // Presets & Trash
     document.getElementById('preset-form').addEventListener('submit', function (e) {
       e.preventDefault();
       const val = document.getElementById('preset-input').value.trim();
@@ -1313,13 +1812,17 @@
       document.getElementById('preset-input').value = '';
     });
 
-    // Navigation & shortcuts
-    document.querySelectorAll('.nav-btn').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        switchView(btn.getAttribute('data-nav'));
-      });
+    document.getElementById('clear-trash-btn').addEventListener('click', function () {
+      trashItems = [];
+      saveTrash();
+      renderAll();
+      showToast('Trash emptied');
     });
 
+    // Navigation & shortcuts
+    document.querySelectorAll('.nav-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () { switchView(btn.getAttribute('data-nav')); });
+    });
     document.getElementById('home-add-btn').addEventListener('click', function () { switchView('add'); });
     document.getElementById('home-list-btn').addEventListener('click', function () { switchView('items'); });
     document.getElementById('items-add-btn').addEventListener('click', function () { switchView('add'); });
@@ -1329,6 +1832,7 @@
     document.getElementById('stat-lent-btn').addEventListener('click', function () { activeFilter = 'Lent'; switchView('items'); });
     document.getElementById('stat-rooms-btn').addEventListener('click', function () { switchView('more'); });
     document.getElementById('home-expiry-banner').addEventListener('click', function () { activeFilter = 'Expiring'; switchView('items'); });
+    document.getElementById('sort-select').addEventListener('change', function (e) { sortBy = e.target.value; renderItemsView(); });
 
     // Search sync
     document.getElementById('home-search-input').addEventListener('input', function (e) {
@@ -1340,13 +1844,11 @@
         document.getElementById('list-search-input').focus();
       }
     });
-
     document.getElementById('list-search-input').addEventListener('input', function (e) {
       searchQuery = e.target.value;
       document.getElementById('home-search-input').value = searchQuery;
       renderItemsView();
     });
-
     document.getElementById('clear-filter-btn').addEventListener('click', function () {
       searchQuery = '';
       activeFilter = 'All';
@@ -1355,7 +1857,7 @@
       renderItemsView();
     });
 
-    // Backup & Restore
+    // Backup & Family Merge
     const backupMsg = document.getElementById('backup-msg');
     const importFile = document.getElementById('import-file');
 
@@ -1373,9 +1875,7 @@
         URL.revokeObjectURL(url);
         backupMsg.textContent = 'Backup downloaded (' + items.length + ' items)!';
       } catch (err) {
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard.writeText(json);
-        }
+        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(json);
         backupMsg.textContent = 'Backup copied to clipboard (' + items.length + ' items)!';
       }
       backupMsg.className = 'text-xs font-semibold text-emerald-700 dark:text-emerald-400';
@@ -1386,6 +1886,26 @@
       importFile.click();
     });
 
+    function normalizeImported(parsed) {
+      return parsed.filter(function (x) { return x && x.name && (x.place || x.location); }).map(function (x, i) {
+        return {
+          id: typeof x.id === 'number' ? x.id : i + 1,
+          name: String(x.name),
+          place: String(x.place || x.location),
+          room: x.room ? String(x.room) : '',
+          qty: (x.qty !== undefined && x.qty !== null && x.qty !== '') ? Number(x.qty) : '',
+          note: x.note ? String(x.note) : '',
+          expiry: x.expiry ? String(x.expiry) : '',
+          lentTo: x.lentTo ? String(x.lentTo) : '',
+          lentDate: x.lentDate ? String(x.lentDate) : '',
+          photo: x.photo ? String(x.photo) : '',
+          isPrivate: Boolean(x.isPrivate),
+          pinned: Boolean(x.pinned),
+          date: x.date ? String(x.date) : ''
+        };
+      });
+    }
+
     importFile.addEventListener('change', function (e) {
       const file = e.target.files && e.target.files[0];
       if (!file) return;
@@ -1394,32 +1914,56 @@
         try {
           const parsed = JSON.parse(ev.target.result);
           if (!Array.isArray(parsed)) throw new Error('Invalid');
-          items = parsed.filter(function (x) { return x && x.name && (x.place || x.location); }).map(function (x, i) {
-            return {
-              id: typeof x.id === 'number' ? x.id : i + 1,
-              name: String(x.name),
-              place: String(x.place || x.location),
-              room: x.room ? String(x.room) : '',
-              note: x.note ? String(x.note) : '',
-              expiry: x.expiry ? String(x.expiry) : '',
-              lentTo: x.lentTo ? String(x.lentTo) : '',
-              lentDate: x.lentDate ? String(x.lentDate) : '',
-              photo: x.photo ? String(x.photo) : '',
-              pinned: Boolean(x.pinned),
-              date: x.date ? String(x.date) : ''
-            };
-          });
-          nextId = items.reduce(function (m, x) { return Math.max(m, x.id || 0); }, 0) + 1;
-          saveItems();
-          renderAll();
-          backupMsg.textContent = 'Restored ' + items.length + ' items!';
-          backupMsg.className = 'text-xs font-semibold text-emerald-700 dark:text-emerald-400';
+          pendingImportItems = normalizeImported(parsed);
+          document.getElementById('import-choice-desc').textContent =
+            'Found ' + pendingImportItems.length + ' items in backup. Do you want to merge them with your current list or replace everything?';
+          document.getElementById('import-choice-modal').classList.remove('hidden');
         } catch (err) {
           backupMsg.textContent = 'Invalid backup file.';
           backupMsg.className = 'text-xs font-semibold text-red-600';
         }
       };
       reader.readAsText(file);
+    });
+
+    document.getElementById('import-choice-close').addEventListener('click', function () {
+      pendingImportItems = null;
+      document.getElementById('import-choice-modal').classList.add('hidden');
+    });
+
+    document.getElementById('import-replace-btn').addEventListener('click', function () {
+      if (!pendingImportItems) return;
+      items = pendingImportItems;
+      nextId = items.reduce(function (m, x) { return Math.max(m, x.id || 0); }, 0) + 1;
+      saveItems();
+      renderAll();
+      backupMsg.textContent = 'Replaced list with ' + items.length + ' items!';
+      backupMsg.className = 'text-xs font-semibold text-emerald-700 dark:text-emerald-400';
+      pendingImportItems = null;
+      document.getElementById('import-choice-modal').classList.add('hidden');
+    });
+
+    document.getElementById('import-merge-btn').addEventListener('click', function () {
+      if (!pendingImportItems) return;
+      const existingKeys = new Set(items.map(function (x) {
+        return (x.name + '||' + x.place).toLowerCase();
+      }));
+      let added = 0;
+      pendingImportItems.forEach(function (x) {
+        const key = (x.name + '||' + x.place).toLowerCase();
+        if (!existingKeys.has(key)) {
+          x.id = nextId++;
+          items.push(x);
+          existingKeys.add(key);
+          added++;
+        }
+      });
+      saveItems();
+      renderAll();
+      backupMsg.textContent = 'Merged! Added ' + added + ' new items (' + items.length + ' total).';
+      backupMsg.className = 'text-xs font-semibold text-emerald-700 dark:text-emerald-400';
+      pendingImportItems = null;
+      document.getElementById('import-choice-modal').classList.add('hidden');
     });
 
     // Dark Mode
@@ -1437,8 +1981,19 @@
       try { localStorage.setItem(THEME_KEY, isDark ? 'dark' : 'light'); } catch (e) {}
     });
 
-    // Init
-    switchView('home');
+    // Init & QR ?room= deep-link support
+    (function init() {
+      try {
+        const params = new URLSearchParams(window.location.search);
+        const roomParam = params.get('room');
+        if (roomParam) {
+          activeFilter = roomParam;
+          switchView('items');
+          return;
+        }
+      } catch (e) {}
+      switchView('home');
+    })();
   </script>
   <script>
     if ('serviceWorker' in navigator) {
