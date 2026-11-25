@@ -1,4 +1,4 @@
-const CACHE_NAME = 'where-i-put-it-v4';
+const CACHE_NAME = 'where-i-put-it-v4-1';
 const LOCAL_ASSETS = [
   './',
   './index.html',
@@ -28,6 +28,24 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
+
+  // Network-first for HTML pages so updates show up immediately when online
+  if (event.request.mode === 'navigate' || event.request.destination === 'document') {
+    event.respondWith(
+      fetch(event.request)
+        .then((res) => {
+          if (res && res.status === 200) {
+            const copy = res.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
+          }
+          return res;
+        })
+        .catch(() => caches.match(event.request, { ignoreSearch: true }))
+    );
+    return;
+  }
+
+  // Cache-first for icons, CSS, and scripts
   event.respondWith(
     caches.match(event.request, { ignoreSearch: true }).then((cached) => {
       const networkFetch = fetch(event.request)

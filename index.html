@@ -27,7 +27,7 @@
     <div class="max-w-lg mx-auto px-4 h-14 flex items-center justify-between">
       <div class="flex items-center gap-2">
         <span class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-amber-600 text-white text-sm font-bold shadow-sm">📦</span>
-        <span class="font-extrabold tracking-tight text-base sm:text-lg">Where Did I Put It?</span>
+        <span class="font-extrabold tracking-tight text-base sm:text-lg">Where Did I Put It?</span><span class="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-stone-200 dark:bg-stone-800 text-stone-600 dark:text-stone-400">v4.1</span>
       </div>
       <button
         id="theme-btn"
@@ -448,9 +448,12 @@
             📋 Copy Text
           </button>
           <button id="share-native-btn" type="button" class="rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold py-2.5 cursor-pointer">
-            📱 More Apps
+            📱 Share Photo &amp; Text
           </button>
         </div>
+        <button id="share-save-photo-btn" type="button" class="hidden w-full rounded-xl border border-stone-300 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 hover:bg-stone-100 dark:hover:bg-stone-700 text-stone-800 dark:text-stone-200 text-xs font-bold py-2.5 cursor-pointer">
+          💾 Save Photo to Phone
+        </button>
       </div>
     </div>
   </div>
@@ -620,7 +623,10 @@
       activeSharePhoto = entry.photo || '';
       document.getElementById('share-preview-text').textContent = text;
       document.getElementById('share-wa-link').href = 'https://wa.me/?text=' + encodeURIComponent(text);
-      document.getElementById('share-native-btn').classList.toggle('hidden', !navigator.share);
+      const nativeBtn = document.getElementById('share-native-btn');
+      nativeBtn.classList.toggle('hidden', !navigator.share);
+      nativeBtn.textContent = activeSharePhoto ? '📷 Share Photo & Text' : '📱 More Apps';
+      document.getElementById('share-save-photo-btn').classList.toggle('hidden', !activeSharePhoto);
       document.getElementById('share-modal').classList.remove('hidden');
     }
 
@@ -1246,25 +1252,40 @@
       copyTextFallback(activeShareText);
       closeShareModal();
     });
+    document.getElementById('share-save-photo-btn').addEventListener('click', function () {
+      if (!activeSharePhoto) return;
+      try {
+        const a = document.createElement('a');
+        a.href = activeSharePhoto;
+        a.download = (activeShareTitle || 'item').replace(/[^a-z0-9]/gi, '_').toLowerCase() + '.jpg';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        showToast('Photo saved!');
+      } catch (e) {
+        showToast('Could not save photo');
+      }
+    });
+
     document.getElementById('share-native-btn').addEventListener('click', function () {
       if (navigator.share) {
-        const shareData = { title: activeShareTitle, text: activeShareText };
         if (activeSharePhoto && navigator.canShare) {
           try {
             const file = dataUrlToFile(activeSharePhoto, 'where-i-put-it.jpg');
             if (navigator.canShare({ files: [file] })) {
-              shareData.files = [file];
+              navigator.share({ files: [file], text: activeShareText }).catch(function (err) {
+                if (err && err.name === 'AbortError') return;
+                navigator.share({ files: [file] }).catch(function () {
+                  showToast('Photo share blocked—use Save Photo or Copy Text');
+                });
+              });
+              closeShareModal();
+              return;
             }
           } catch (e) {}
         }
-        navigator.share(shareData).catch(function () {
-          if (shareData.files) {
-            navigator.share({ title: activeShareTitle, text: activeShareText }).catch(function () {
-              copyTextFallback(activeShareText);
-            });
-          } else {
-            copyTextFallback(activeShareText);
-          }
+        navigator.share({ title: activeShareTitle, text: activeShareText }).catch(function (err) {
+          if (err && err.name !== 'AbortError') copyTextFallback(activeShareText);
         });
       } else {
         copyTextFallback(activeShareText);
