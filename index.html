@@ -29,7 +29,7 @@
       <div class="flex items-center gap-2 min-w-0">
         <span class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-amber-600 text-white text-sm font-bold shadow-sm shrink-0">📦</span>
         <span class="font-extrabold tracking-tight text-base sm:text-lg truncate">Where Did I Put It?</span>
-        <span class="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-stone-200 dark:bg-stone-800 text-stone-600 dark:text-stone-400 shrink-0">v5.1</span>
+        <span class="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-stone-200 dark:bg-stone-800 text-stone-600 dark:text-stone-400 shrink-0">v5.2</span>
       </div>
       <div class="flex items-center gap-1.5 shrink-0">
         <button
@@ -136,6 +136,18 @@
             <p id="home-expiry-desc" class="text-xs text-red-700 dark:text-red-400 mt-0.5"></p>
           </div>
           <span class="text-xs font-bold text-red-700 dark:text-red-300 shrink-0">View →</span>
+        </div>
+      </button>
+
+      <!-- Enable Notifications Prompt -->
+      <button
+        id="home-notif-prompt"
+        type="button"
+        class="hidden w-full text-left bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/70 rounded-2xl p-3 shadow-sm hover:bg-amber-100/70 transition cursor-pointer"
+      >
+        <div class="flex items-center justify-between gap-2">
+          <p class="text-xs font-semibold text-amber-900 dark:text-amber-300">🔔 Turn on expiry alerts when opening the app</p>
+          <span class="text-xs font-bold text-amber-700 dark:text-amber-400 shrink-0">Enable</span>
         </div>
       </button>
 
@@ -457,6 +469,17 @@
         <div id="presets-manage-list" class="flex flex-wrap gap-1.5"></div>
       </div>
 
+      <!-- Expiry Notifications -->
+      <div class="bg-white dark:bg-stone-900 rounded-3xl border border-stone-200 dark:border-stone-800 p-5 shadow-sm space-y-3">
+        <div>
+          <h2 class="text-sm font-bold text-stone-800 dark:text-stone-200">🔔 Expiry Notifications</h2>
+          <p id="notif-status-text" class="text-xs text-stone-500 dark:text-stone-400 mt-0.5">Get notified when items are expiring within 30 days.</p>
+        </div>
+        <button id="notif-enable-btn" type="button" class="rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-3.5 py-2 transition cursor-pointer">
+          Enable Notifications
+        </button>
+      </div>
+
       <!-- Private PIN Lock -->
       <div class="bg-white dark:bg-stone-900 rounded-3xl border border-stone-200 dark:border-stone-800 p-5 shadow-sm space-y-3">
         <div class="flex items-center justify-between">
@@ -636,6 +659,31 @@
     </div>
   </div>
 
+  <!-- Calendar Reminder Modal -->
+  <div id="remind-modal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="w-full max-w-sm bg-white dark:bg-stone-900 rounded-3xl border border-stone-200 dark:border-stone-800 p-5 shadow-xl space-y-4">
+      <div class="flex items-center justify-between">
+        <h2 class="text-base font-extrabold">Add Calendar Reminder</h2>
+        <button id="remind-close-btn" type="button" class="text-stone-400 hover:text-stone-700 dark:hover:text-stone-200 text-lg font-bold px-2 cursor-pointer">✕</button>
+      </div>
+      <p id="remind-desc" class="text-xs text-stone-600 dark:text-stone-300"></p>
+      <div class="space-y-2">
+        <a
+          id="remind-gcal-link"
+          href="https://calendar.google.com/"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="w-full flex items-center justify-center gap-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold py-3 transition"
+        >
+          📅 Add to Google Calendar
+        </a>
+        <button id="remind-ics-btn" type="button" class="w-full rounded-xl bg-stone-200 dark:bg-stone-800 hover:bg-stone-300 dark:hover:bg-stone-700 text-stone-900 dark:text-stone-100 text-xs font-bold py-3 cursor-pointer">
+          📥 Save Phone Calendar File (.ics)
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- QR Label Modal -->
   <div id="qr-modal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
     <div class="w-full max-w-xs bg-white dark:bg-stone-900 rounded-3xl border border-stone-200 dark:border-stone-800 p-5 shadow-xl space-y-4 text-center">
@@ -692,6 +740,7 @@
     const ROOMS_KEY = 'where_i_put_it_v2_rooms';
     const TRASH_KEY = 'where_i_put_it_v5_trash';
     const PIN_KEY = 'where_i_put_it_v5_pin';
+    const NOTIF_KEY = 'where_i_put_it_v5_last_notif';
     const THEME_KEY = 'where_i_put_it_v2_theme';
 
     const DEFAULT_ITEMS = [];
@@ -731,6 +780,7 @@
     let pendingImportItems = null;
     let pinMode = 'unlock'; // 'unlock' | 'set'
     let activeQrRoom = '';
+    let activeRemindEntry = null;
     let activeShareText = '';
     let activeShareTitle = '';
     let activeSharePhoto = '';
@@ -895,6 +945,105 @@
 
     function closePinModal() {
       document.getElementById('pin-modal').classList.add('hidden');
+    }
+
+    function openRemindModal(entry) {
+      activeRemindEntry = entry;
+      const parts = entry.expiry.split('-');
+      const expDate = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+      const remDate = new Date(expDate.getTime() - 7 * 24 * 60 * 60 * 1000);
+      const ymd = function (d) {
+        return d.getFullYear() + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0');
+      };
+      const nextDay = new Date(remDate.getTime() + 24 * 60 * 60 * 1000);
+      const title = 'Check/Renew: ' + entry.name;
+      const details = 'Kept at: ' + entry.place + (entry.room ? ' (' + entry.room + ')' : '') + '\nExpiry Date: ' + entry.expiry;
+      document.getElementById('remind-desc').textContent =
+        'Sets a reminder for ' + remDate.toLocaleDateString() + ' (7 days before ' + entry.expiry + ').';
+      document.getElementById('remind-gcal-link').href =
+        'https://calendar.google.com/calendar/render?action=TEMPLATE&text=' + encodeURIComponent(title) +
+        '&dates=' + ymd(remDate) + '/' + ymd(nextDay) +
+        '&details=' + encodeURIComponent(details);
+      document.getElementById('remind-modal').classList.remove('hidden');
+    }
+
+    function closeRemindModal() {
+      activeRemindEntry = null;
+      document.getElementById('remind-modal').classList.add('hidden');
+    }
+
+    function updateNotifUI() {
+      const statusEl = document.getElementById('notif-status-text');
+      const btnEl = document.getElementById('notif-enable-btn');
+      const promptEl = document.getElementById('home-notif-prompt');
+      if (!('Notification' in window)) {
+        if (statusEl) statusEl.textContent = 'Browser notifications are not supported on this view.';
+        if (btnEl) btnEl.classList.add('hidden');
+        if (promptEl) promptEl.classList.add('hidden');
+        return;
+      }
+      if (Notification.permission === 'granted') {
+        if (statusEl) statusEl.textContent = 'Notifications are enabled. You will be alerted when opening the app.';
+        if (btnEl) { btnEl.textContent = '✓ Notifications Enabled'; btnEl.disabled = true; btnEl.classList.add('opacity-70'); }
+        if (promptEl) promptEl.classList.add('hidden');
+      } else if (Notification.permission === 'denied') {
+        if (statusEl) statusEl.textContent = 'Notifications were blocked in browser settings.';
+        if (btnEl) btnEl.classList.add('hidden');
+        if (promptEl) promptEl.classList.add('hidden');
+      } else {
+        if (statusEl) statusEl.textContent = 'Get notified when items are expiring within 30 days.';
+        if (btnEl) btnEl.classList.remove('hidden');
+        const hasExpiry = items.some(function (x) { return Boolean(x.expiry); });
+        if (promptEl) promptEl.classList.toggle('hidden', !hasExpiry);
+      }
+    }
+
+    function requestAndCheckNotifications(fromUserClick) {
+      if (!('Notification' in window)) {
+        if (fromUserClick) showToast('Notifications work on your installed Android app.');
+        return;
+      }
+      if (Notification.permission === 'default' && fromUserClick) {
+        Notification.requestPermission().then(function (perm) {
+          updateNotifUI();
+          if (perm === 'granted') {
+            try { localStorage.removeItem(NOTIF_KEY); } catch (e) {}
+            fireDueNotification(true);
+          }
+        });
+        return;
+      }
+      if (Notification.permission === 'granted') {
+        fireDueNotification(fromUserClick);
+      }
+    }
+
+    function fireDueNotification(force) {
+      const due = items.filter(function (x) {
+        const s = getExpiryStatus(x.expiry);
+        return s && (s.type === 'expired' || s.type === 'soon');
+      });
+      if (due.length === 0) {
+        if (force) showToast('Notifications enabled! No items due soon.');
+        return;
+      }
+      const todayKey = new Date().toISOString().slice(0, 10);
+      let lastKey = '';
+      try { lastKey = localStorage.getItem(NOTIF_KEY) || ''; } catch (e) {}
+      if (!force && lastKey === todayKey) return;
+      try { localStorage.setItem(NOTIF_KEY, todayKey); } catch (e) {}
+
+      const title = '⚠️ ' + due.length + (due.length === 1 ? ' item needs attention' : ' items need attention');
+      const body = due.slice(0, 3).map(function (x) { return x.name + ' (' + x.expiry + ')'; }).join(', ');
+      if (navigator.serviceWorker && navigator.serviceWorker.ready) {
+        navigator.serviceWorker.ready.then(function (reg) {
+          if (reg && reg.showNotification) {
+            reg.showNotification(title, { body: body, icon: 'icon-192.png' });
+          }
+        }).catch(function () {});
+      } else {
+        try { new Notification(title, { body: body }); } catch (e) {}
+      }
     }
 
     function openQrModal(roomName) {
@@ -1135,6 +1284,15 @@
           showToast('Marked as returned!');
         });
         actionBar.appendChild(returnBtn);
+      }
+
+      if (entry.expiry) {
+        const remindBtn = document.createElement('button');
+        remindBtn.type = 'button';
+        remindBtn.className = 'text-xs font-semibold text-purple-700 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-950/40 px-2.5 py-1 rounded-lg transition cursor-pointer';
+        remindBtn.textContent = '📅 Remind';
+        remindBtn.addEventListener('click', function () { openRemindModal(entry); });
+        actionBar.appendChild(remindBtn);
       }
 
       const shareBtn = document.createElement('button');
@@ -1463,6 +1621,7 @@
     }
 
     function renderAll() {
+      updateNotifUI();
       renderHeaderLock();
       renderHome();
       renderItemsView();
@@ -1792,6 +1951,56 @@
     });
 
     // QR modal listeners
+    document.getElementById('remind-close-btn').addEventListener('click', closeRemindModal);
+    document.getElementById('remind-modal').addEventListener('click', function (e) {
+      if (e.target.id === 'remind-modal') closeRemindModal();
+    });
+    document.getElementById('remind-ics-btn').addEventListener('click', function () {
+      if (!activeRemindEntry || !activeRemindEntry.expiry) return;
+      const parts = activeRemindEntry.expiry.split('-');
+      const expDate = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+      const remDate = new Date(expDate.getTime() - 7 * 24 * 60 * 60 * 1000);
+      const ymd = function (d) {
+        return d.getFullYear() + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0');
+      };
+      const nextDay = new Date(remDate.getTime() + 24 * 60 * 60 * 1000);
+      const ics = [
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'PRODID:-//Where Did I Put It//EN',
+        'BEGIN:VEVENT',
+        'UID:' + Date.now() + '@whereiputit',
+        'DTSTAMP:' + ymd(new Date()) + 'T090000Z',
+        'DTSTART;VALUE=DATE:' + ymd(remDate),
+        'DTEND;VALUE=DATE:' + ymd(nextDay),
+        'SUMMARY:Check/Renew: ' + activeRemindEntry.name,
+        'DESCRIPTION:Kept at: ' + activeRemindEntry.place + ' (Expires: ' + activeRemindEntry.expiry + ')',
+        'BEGIN:VALARM',
+        'TRIGGER:PT9H',
+        'ACTION:DISPLAY',
+        'DESCRIPTION:Reminder',
+        'END:VALARM',
+        'END:VEVENT',
+        'END:VCALENDAR'
+      ].join('\r\n');
+      try {
+        const blob = new Blob([ics], { type: 'text/calendar' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'reminder-' + activeRemindEntry.name.replace(/[^a-z0-9]/gi, '_').toLowerCase() + '.ics';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast('Calendar file saved! Tap to open.');
+      } catch (e) {
+        showToast('Use Google Calendar link above.');
+      }
+      closeRemindModal();
+    });
+    document.getElementById('notif-enable-btn').addEventListener('click', function () { requestAndCheckNotifications(true); });
+    document.getElementById('home-notif-prompt').addEventListener('click', function () { requestAndCheckNotifications(true); });
     document.getElementById('qr-close-btn').addEventListener('click', closeQrModal);
     document.getElementById('qr-save-btn').addEventListener('click', function () {
       try {
@@ -2003,6 +2212,7 @@
         }
       } catch (e) {}
       switchView('home');
+      requestAndCheckNotifications(false);
     })();
   </script>
   <script>
