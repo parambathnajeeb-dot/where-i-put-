@@ -47,7 +47,7 @@
       <div class="bg-gradient-to-br from-amber-600 to-amber-700 text-white rounded-3xl p-5 shadow-md">
         <p class="text-amber-100 text-xs font-semibold uppercase tracking-wider">Home Organizer</p>
         <h1 class="text-xl sm:text-2xl font-extrabold mt-1">Find anything in seconds</h1>
-        <p class="text-amber-100 text-sm mt-1">Keep track of keys, documents, chargers, and rarely used items.</p>
+        <p class="text-amber-100 text-sm mt-1">Keep track of keys, documents, lent items, and check-up dates.</p>
 
         <!-- Primary Action Buttons -->
         <div class="grid grid-cols-2 gap-2.5 mt-4">
@@ -76,7 +76,7 @@
           <input
             id="home-search-input"
             type="search"
-            placeholder="Quick search (e.g., Passport, Kitchen)..."
+            placeholder="Quick search (e.g., Passport, Kitchen, Ali)..."
             class="w-full rounded-xl bg-stone-100 dark:bg-stone-800 pl-9 pr-3.5 py-2.5 text-sm text-stone-900 dark:text-stone-100 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-amber-500"
           />
           <span class="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 text-sm pointer-events-none">🔍</span>
@@ -84,20 +84,39 @@
       </div>
 
       <!-- Quick Stats Row -->
-      <div class="grid grid-cols-3 gap-2.5">
-        <button id="stat-total-btn" type="button" class="bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 p-3.5 text-left shadow-sm hover:border-amber-400 transition cursor-pointer">
-          <p id="stat-total" class="text-2xl font-extrabold text-stone-900 dark:text-stone-50">0</p>
-          <p class="text-xs font-medium text-stone-500 dark:text-stone-400 mt-0.5">Saved Items</p>
+      <div class="grid grid-cols-4 gap-2">
+        <button id="stat-total-btn" type="button" class="bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 p-3 text-left shadow-sm hover:border-amber-400 transition cursor-pointer">
+          <p id="stat-total" class="text-xl font-extrabold text-stone-900 dark:text-stone-50">0</p>
+          <p class="text-[11px] font-medium text-stone-500 dark:text-stone-400 mt-0.5">Saved</p>
         </button>
-        <button id="stat-pinned-btn" type="button" class="bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 p-3.5 text-left shadow-sm hover:border-amber-400 transition cursor-pointer">
-          <p id="stat-pinned" class="text-2xl font-extrabold text-amber-600 dark:text-amber-400">0</p>
-          <p class="text-xs font-medium text-stone-500 dark:text-stone-400 mt-0.5">Pinned</p>
+        <button id="stat-pinned-btn" type="button" class="bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 p-3 text-left shadow-sm hover:border-amber-400 transition cursor-pointer">
+          <p id="stat-pinned" class="text-xl font-extrabold text-amber-600 dark:text-amber-400">0</p>
+          <p class="text-[11px] font-medium text-stone-500 dark:text-stone-400 mt-0.5">Pinned</p>
         </button>
-        <button id="stat-rooms-btn" type="button" class="bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 p-3.5 text-left shadow-sm hover:border-amber-400 transition cursor-pointer">
-          <p id="stat-rooms" class="text-2xl font-extrabold text-stone-900 dark:text-stone-50">0</p>
-          <p class="text-xs font-medium text-stone-500 dark:text-stone-400 mt-0.5">Rooms Used</p>
+        <button id="stat-lent-btn" type="button" class="bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 p-3 text-left shadow-sm hover:border-sky-400 transition cursor-pointer">
+          <p id="stat-lent" class="text-xl font-extrabold text-sky-600 dark:text-sky-400">0</p>
+          <p class="text-[11px] font-medium text-stone-500 dark:text-stone-400 mt-0.5">Lent Out</p>
+        </button>
+        <button id="stat-rooms-btn" type="button" class="bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 p-3 text-left shadow-sm hover:border-amber-400 transition cursor-pointer">
+          <p id="stat-rooms" class="text-xl font-extrabold text-stone-900 dark:text-stone-50">0</p>
+          <p class="text-[11px] font-medium text-stone-500 dark:text-stone-400 mt-0.5">Rooms</p>
         </button>
       </div>
+
+      <!-- Expiry / Check-up Alert Banner -->
+      <button
+        id="home-expiry-banner"
+        type="button"
+        class="hidden w-full text-left bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800/70 rounded-2xl p-3.5 shadow-sm hover:bg-red-100/70 dark:hover:bg-red-950/60 transition cursor-pointer"
+      >
+        <div class="flex items-center justify-between gap-2">
+          <div>
+            <p id="home-expiry-title" class="text-xs font-bold text-red-800 dark:text-red-300">⚠️ Check-up / Expiry Alert</p>
+            <p id="home-expiry-desc" class="text-xs text-red-700 dark:text-red-400 mt-0.5"></p>
+          </div>
+          <span class="text-xs font-bold text-red-700 dark:text-red-300 shrink-0">View →</span>
+        </div>
+      </button>
 
       <!-- Pinned Essentials Preview -->
       <div>
@@ -130,13 +149,13 @@
         </button>
       </div>
 
-      <!-- Search + Room Filter Chips -->
+      <!-- Search + Status/Room Filter Chips -->
       <div class="space-y-2.5">
         <div class="relative">
           <input
             id="list-search-input"
             type="search"
-            placeholder="Search by item, place, room, or note..."
+            placeholder="Search by item, place, room, person, or note..."
             class="w-full rounded-xl border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-900 pl-9 pr-3.5 py-2.5 text-sm text-stone-900 dark:text-stone-100 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-amber-500"
           />
           <span class="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 text-sm pointer-events-none">🔍</span>
@@ -193,23 +212,15 @@
 
           <div>
             <label for="f-room" class="block text-xs font-bold uppercase tracking-wide text-stone-500 dark:text-stone-400 mb-1.5">
-              Room or Tag (pick or type your own)
+              Room or Tag (tap a preset or type your own)
             </label>
             <input
               id="f-room"
-              list="room-suggestions"
+              type="text"
               placeholder="e.g., Kitchen, Bedroom, Car"
               class="w-full rounded-xl border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-800 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
             />
-            <datalist id="room-suggestions">
-              <option value="Documents"></option>
-              <option value="Living Room"></option>
-              <option value="Bedroom"></option>
-              <option value="Kitchen"></option>
-              <option value="Entryway"></option>
-              <option value="Car"></option>
-              <option value="Office"></option>
-            </datalist>
+            <div id="form-room-presets" class="flex flex-wrap gap-1.5 mt-2"></div>
           </div>
 
           <div>
@@ -222,6 +233,76 @@
               placeholder="e.g., Inside the red zip pouch"
               class="w-full rounded-xl border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-800 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
             />
+          </div>
+
+          <!-- Photo of the Spot -->
+          <div>
+            <span class="block text-xs font-bold uppercase tracking-wide text-stone-500 dark:text-stone-400 mb-1.5">
+              Photo of the Spot (optional)
+            </span>
+            <div class="flex items-center gap-3">
+              <button
+                id="f-photo-btn"
+                type="button"
+                class="rounded-xl border border-stone-300 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 hover:bg-stone-100 dark:hover:bg-stone-700 text-xs font-semibold px-3.5 py-2.5 transition cursor-pointer"
+              >
+                📷 Add / Take Photo
+              </button>
+              <button
+                id="f-photo-remove"
+                type="button"
+                class="hidden text-xs font-semibold text-red-600 dark:text-red-400 hover:underline cursor-pointer"
+              >
+                Remove photo
+              </button>
+            </div>
+            <input id="f-photo" type="file" accept="image/*" capture="environment" class="hidden" />
+            <div id="f-photo-preview-wrap" class="hidden mt-2.5">
+              <img id="f-photo-preview" alt="Selected spot preview" class="w-28 h-28 object-cover rounded-2xl border border-stone-200 dark:border-stone-700 shadow-sm" />
+            </div>
+          </div>
+
+          <!-- Expiry / Check-up Date -->
+          <div>
+            <label for="f-expiry" class="block text-xs font-bold uppercase tracking-wide text-stone-500 dark:text-stone-400 mb-1.5">
+              Expiry or Check-up Date (optional)
+            </label>
+            <input
+              id="f-expiry"
+              type="date"
+              class="w-full rounded-xl border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-800 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+            />
+          </div>
+
+          <!-- Lent to Someone Toggle -->
+          <div class="rounded-2xl border border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-800/40 p-3.5 space-y-3">
+            <label class="flex items-center gap-2.5 cursor-pointer select-none">
+              <input id="f-lent" type="checkbox" class="w-4 h-4 accent-sky-600 rounded" />
+              <span class="text-sm font-semibold text-stone-800 dark:text-stone-200">🤝 Lent to someone</span>
+            </label>
+            <div id="f-lent-fields" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              <div>
+                <label for="f-lent-to" class="block text-[11px] font-bold uppercase tracking-wide text-stone-500 dark:text-stone-400 mb-1">
+                  Who has it?
+                </label>
+                <input
+                  id="f-lent-to"
+                  type="text"
+                  placeholder="e.g., Rahul, Neighbor"
+                  class="w-full rounded-xl border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
+                />
+              </div>
+              <div>
+                <label for="f-lent-date" class="block text-[11px] font-bold uppercase tracking-wide text-stone-500 dark:text-stone-400 mb-1">
+                  Date lent
+                </label>
+                <input
+                  id="f-lent-date"
+                  type="date"
+                  class="w-full rounded-xl border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
+                />
+              </div>
+            </div>
           </div>
 
           <label class="flex items-center gap-2.5 pt-1 cursor-pointer select-none">
@@ -244,7 +325,7 @@
     <section id="view-more" class="hidden space-y-5">
       <div>
         <h1 class="text-xl font-extrabold">Rooms &amp; Backup</h1>
-        <p class="text-xs text-stone-500 dark:text-stone-400">Browse by room or back up your saved list.</p>
+        <p class="text-xs text-stone-500 dark:text-stone-400">Browse by room, manage presets, or back up your saved list.</p>
       </div>
 
       <!-- Rooms Breakdown -->
@@ -253,11 +334,34 @@
         <div id="rooms-summary" class="grid grid-cols-2 gap-2"></div>
       </div>
 
+      <!-- Custom Room Presets Manager -->
+      <div class="bg-white dark:bg-stone-900 rounded-3xl border border-stone-200 dark:border-stone-800 p-5 shadow-sm space-y-3">
+        <div>
+          <h2 class="text-sm font-bold text-stone-800 dark:text-stone-200">Custom Room Presets</h2>
+          <p class="text-xs text-stone-500 dark:text-stone-400 mt-0.5">Quick-tap room chips shown when adding or moving items.</p>
+        </div>
+        <form id="preset-form" class="flex gap-2">
+          <input
+            id="preset-input"
+            type="text"
+            placeholder="Add room (e.g., Balcony, Garage)"
+            class="flex-1 min-w-0 rounded-xl border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+          />
+          <button
+            type="submit"
+            class="rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-3.5 py-2 transition cursor-pointer shrink-0"
+          >
+            + Add
+          </button>
+        </form>
+        <div id="presets-manage-list" class="flex flex-wrap gap-1.5"></div>
+      </div>
+
       <!-- Backup & Restore -->
       <div class="bg-white dark:bg-stone-900 rounded-3xl border border-stone-200 dark:border-stone-800 p-5 shadow-sm space-y-3">
         <div>
           <h2 class="text-sm font-bold text-stone-800 dark:text-stone-200">Backup &amp; Restore</h2>
-          <p class="text-xs text-stone-500 dark:text-stone-400 mt-0.5">Save a copy of your items or restore from a `.json` backup.</p>
+          <p class="text-xs text-stone-500 dark:text-stone-400 mt-0.5">Save a copy of your items (including photos) or restore from a `.json` backup.</p>
         </div>
         <div class="grid grid-cols-2 gap-2.5">
           <button id="export-btn" type="button" class="rounded-xl bg-stone-200 dark:bg-stone-800 hover:bg-stone-300 dark:hover:bg-stone-700 text-stone-900 dark:text-stone-100 text-xs font-bold py-2.5 px-3 transition cursor-pointer">
@@ -274,8 +378,94 @@
 
   </main>
 
+  <!-- Quick Move Modal -->
+  <div id="move-modal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="w-full max-w-sm bg-white dark:bg-stone-900 rounded-3xl border border-stone-200 dark:border-stone-800 p-5 shadow-xl space-y-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-base font-extrabold">Move Item</h2>
+          <p id="move-item-name" class="text-xs text-stone-500 dark:text-stone-400 mt-0.5"></p>
+        </div>
+        <button id="move-close-btn" type="button" class="text-stone-400 hover:text-stone-700 dark:hover:text-stone-200 text-lg font-bold px-2 cursor-pointer">✕</button>
+      </div>
+      <form id="move-form" class="space-y-3">
+        <div>
+          <label for="move-place" class="block text-xs font-bold uppercase tracking-wide text-stone-500 dark:text-stone-400 mb-1">
+            New Location *
+          </label>
+          <input
+            id="move-place"
+            type="text"
+            required
+            placeholder="e.g., Kitchen top cabinet"
+            class="w-full rounded-xl border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-800 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+          />
+        </div>
+        <div>
+          <label for="move-room" class="block text-xs font-bold uppercase tracking-wide text-stone-500 dark:text-stone-400 mb-1">
+            New Room (optional)
+          </label>
+          <input
+            id="move-room"
+            type="text"
+            placeholder="e.g., Kitchen"
+            class="w-full rounded-xl border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-800 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+          />
+          <div id="move-room-presets" class="flex flex-wrap gap-1.5 mt-2"></div>
+        </div>
+        <div class="grid grid-cols-2 gap-2 pt-1">
+          <button id="move-cancel-btn" type="button" class="rounded-xl bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-200 text-xs font-bold py-2.5 cursor-pointer">
+            Cancel
+          </button>
+          <button type="submit" class="rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold py-2.5 cursor-pointer">
+            Save New Spot
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Share Modal -->
+  <div id="share-modal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="w-full max-w-sm bg-white dark:bg-stone-900 rounded-3xl border border-stone-200 dark:border-stone-800 p-5 shadow-xl space-y-4">
+      <div class="flex items-center justify-between">
+        <h2 class="text-base font-extrabold">Share Item Location</h2>
+        <button id="share-close-btn" type="button" class="text-stone-400 hover:text-stone-700 dark:hover:text-stone-200 text-lg font-bold px-2 cursor-pointer">✕</button>
+      </div>
+      <pre id="share-preview-text" class="whitespace-pre-wrap font-sans text-xs bg-stone-100 dark:bg-stone-800 text-stone-800 dark:text-stone-200 rounded-2xl p-3.5 border border-stone-200 dark:border-stone-700"></pre>
+      <div class="space-y-2">
+        <a
+          id="share-wa-link"
+          href="https://wa.me/"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="w-full flex items-center justify-center gap-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-3 transition"
+        >
+          💬 Send on WhatsApp
+        </a>
+        <div class="grid grid-cols-2 gap-2">
+          <button id="share-copy-btn" type="button" class="rounded-xl bg-stone-200 dark:bg-stone-800 hover:bg-stone-300 dark:hover:bg-stone-700 text-stone-900 dark:text-stone-100 text-xs font-bold py-2.5 cursor-pointer">
+            📋 Copy Text
+          </button>
+          <button id="share-native-btn" type="button" class="rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold py-2.5 cursor-pointer">
+            📱 More Apps
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fullscreen Photo Lightbox Modal -->
+  <div id="photo-modal" class="hidden fixed inset-0 z-50 bg-black/85 flex flex-col items-center justify-center p-4">
+    <button id="photo-modal-close" type="button" class="self-end mb-2 rounded-full bg-white/15 hover:bg-white/25 text-white text-xs font-bold px-3.5 py-1.5 cursor-pointer">
+      ✕ Close
+    </button>
+    <img id="photo-modal-img" alt="Saved item spot" class="max-w-full max-h-[75vh] rounded-2xl shadow-2xl object-contain" />
+    <p id="photo-modal-caption" class="text-white text-xs font-semibold mt-3 text-center"></p>
+  </div>
+
   <!-- Toast Banner -->
-  <div id="toast" class="hidden fixed bottom-20 left-1/2 -translate-x-1/2 z-40 bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 text-xs font-semibold px-4 py-2.5 rounded-full shadow-lg"></div>
+  <div id="toast" class="hidden fixed bottom-20 left-1/2 -translate-x-1/2 z-40 bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 text-xs font-semibold px-4 py-2.5 rounded-full shadow-lg whitespace-nowrap"></div>
 
   <!-- Bottom Navigation Bar -->
   <nav class="fixed bottom-0 inset-x-0 z-30 bg-white/95 dark:bg-stone-900/95 backdrop-blur border-t border-stone-200 dark:border-stone-800">
@@ -301,6 +491,7 @@
 
   <script>
     const STORAGE_KEY = 'where_i_put_it_v2_items';
+    const ROOMS_KEY = 'where_i_put_it_v2_rooms';
     const THEME_KEY = 'where_i_put_it_v2_theme';
 
     const DEFAULT_ITEMS = [
@@ -308,6 +499,8 @@
       { id: 2, name: 'Spare House Keys', place: 'Ceramic bowl by front door', room: 'Entryway', note: '', pinned: true, date: 'Starter' },
       { id: 3, name: 'TV Remote Batteries', place: 'Left kitchen drawer', room: 'Kitchen', note: 'AA & AAA pack', pinned: false, date: 'Starter' }
     ];
+
+    const DEFAULT_ROOMS = ['Documents', 'Living Room', 'Bedroom', 'Kitchen', 'Entryway', 'Car', 'Office'];
 
     function loadItems() {
       try {
@@ -320,12 +513,26 @@
       return DEFAULT_ITEMS.slice();
     }
 
+    function loadRooms() {
+      try {
+        const raw = localStorage.getItem(ROOMS_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+      } catch (e) {}
+      return DEFAULT_ROOMS.slice();
+    }
+
     let items = loadItems();
+    let roomPresets = loadRooms();
     let nextId = items.reduce(function (m, x) { return Math.max(m, x.id || 0); }, 0) + 1;
     let currentView = 'home';
     let searchQuery = '';
-    let activeRoom = 'All';
+    let activeFilter = 'All'; // 'All', 'Lent', 'Expiring', or a room name
     let editingId = null;
+    let movingId = null;
+    let currentPhotoData = '';
     let confirmDeleteId = null;
     let confirmTimer = null;
     let toastTimer = null;
@@ -333,6 +540,16 @@
     function saveItems() {
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+        return true;
+      } catch (e) {
+        showToast('Storage full! Try removing large photos or exporting backup.');
+        return false;
+      }
+    }
+
+    function saveRooms() {
+      try {
+        localStorage.setItem(ROOMS_KEY, JSON.stringify(roomPresets));
       } catch (e) {}
     }
 
@@ -341,7 +558,99 @@
       el.textContent = text;
       el.classList.remove('hidden');
       if (toastTimer) clearTimeout(toastTimer);
-      toastTimer = setTimeout(function () { el.classList.add('hidden'); }, 2500);
+      toastTimer = setTimeout(function () { el.classList.add('hidden'); }, 2800);
+    }
+
+    function getExpiryStatus(expiryStr) {
+      if (!expiryStr) return null;
+      const parts = expiryStr.split('-');
+      if (parts.length !== 3) return null;
+      const target = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const diffDays = Math.round((target - today) / (1000 * 60 * 60 * 24));
+      if (diffDays < 0) return { type: 'expired', label: '⚠️ Expired ' + expiryStr, days: diffDays };
+      if (diffDays <= 30) return { type: 'soon', label: '⏳ Due in ' + diffDays + 'd (' + expiryStr + ')', days: diffDays };
+      return { type: 'ok', label: '📅 Check ' + expiryStr, days: diffDays };
+    }
+
+    let activeShareText = '';
+    let activeShareTitle = '';
+
+    function copyTextFallback(text) {
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).catch(function () {});
+        } else {
+          const ta = document.createElement('textarea');
+          ta.value = text;
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand('copy');
+          document.body.removeChild(ta);
+        }
+        showToast('Copied! Paste into WhatsApp.');
+      } catch (e) {
+        showToast('Could not copy text');
+      }
+    }
+
+    function shareItem(entry) {
+      let text = '📦 ' + entry.name + '\n📍 Kept at: ' + entry.place;
+      if (entry.room) text += ' (' + entry.room + ')';
+      if (entry.lentTo) text += '\n🤝 Currently lent to: ' + entry.lentTo + (entry.lentDate ? ' (' + entry.lentDate + ')' : '');
+      if (entry.note) text += '\n📝 Note: ' + entry.note;
+
+      activeShareText = text;
+      activeShareTitle = entry.name;
+      document.getElementById('share-preview-text').textContent = text;
+      document.getElementById('share-wa-link').href = 'https://wa.me/?text=' + encodeURIComponent(text);
+      document.getElementById('share-native-btn').classList.toggle('hidden', !navigator.share);
+      document.getElementById('share-modal').classList.remove('hidden');
+    }
+
+    function closeShareModal() {
+      document.getElementById('share-modal').classList.add('hidden');
+    }
+
+    function openMoveModal(entry) {
+      movingId = entry.id;
+      document.getElementById('move-item-name').textContent = entry.name;
+      document.getElementById('move-place').value = entry.place;
+      document.getElementById('move-room').value = entry.room || '';
+      renderRoomPresetChips('move-room-presets', 'move-room');
+      document.getElementById('move-modal').classList.remove('hidden');
+    }
+
+    function closeMoveModal() {
+      movingId = null;
+      document.getElementById('move-modal').classList.add('hidden');
+    }
+
+    function openPhotoModal(src, caption) {
+      document.getElementById('photo-modal-img').src = src;
+      document.getElementById('photo-modal-caption').textContent = caption || '';
+      document.getElementById('photo-modal').classList.remove('hidden');
+    }
+
+    function closePhotoModal() {
+      document.getElementById('photo-modal').classList.add('hidden');
+      document.getElementById('photo-modal-img').src = '';
+    }
+
+    function renderRoomPresetChips(containerId, targetInputId) {
+      const wrap = document.getElementById(containerId);
+      wrap.innerHTML = '';
+      roomPresets.forEach(function (roomName) {
+        const chip = document.createElement('button');
+        chip.type = 'button';
+        chip.className = 'px-2.5 py-1 rounded-full text-[11px] font-semibold bg-stone-100 dark:bg-stone-800 hover:bg-amber-100 dark:hover:bg-amber-900/50 text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-stone-700 transition cursor-pointer';
+        chip.textContent = roomName;
+        chip.addEventListener('click', function () {
+          document.getElementById(targetInputId).value = roomName;
+        });
+        wrap.appendChild(chip);
+      });
     }
 
     function switchView(view, options) {
@@ -368,14 +677,32 @@
     function createItemCard(entry) {
       const li = document.createElement('li');
       li.className = entry.pinned
-        ? 'bg-amber-50/60 dark:bg-amber-950/20 rounded-2xl border border-amber-300 dark:border-amber-700/70 p-4 shadow-sm'
-        : 'bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 p-4 shadow-sm';
+        ? 'bg-amber-50/60 dark:bg-amber-950/20 rounded-2xl border border-amber-300 dark:border-amber-700/70 p-4 shadow-sm space-y-2.5'
+        : 'bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 p-4 shadow-sm space-y-2.5';
 
       const topRow = document.createElement('div');
       topRow.className = 'flex items-start justify-between gap-3';
 
+      const leftGroup = document.createElement('div');
+      leftGroup.className = 'flex items-start gap-3 min-w-0 flex-1';
+
+      if (entry.photo) {
+        const thumbBtn = document.createElement('button');
+        thumbBtn.type = 'button';
+        thumbBtn.className = 'shrink-0 rounded-xl overflow-hidden border border-stone-200 dark:border-stone-700 cursor-pointer';
+        const img = document.createElement('img');
+        img.src = entry.photo;
+        img.alt = entry.name;
+        img.className = 'w-14 h-14 object-cover';
+        thumbBtn.appendChild(img);
+        thumbBtn.addEventListener('click', function () {
+          openPhotoModal(entry.photo, entry.name + ' — ' + entry.place);
+        });
+        leftGroup.appendChild(thumbBtn);
+      }
+
       const info = document.createElement('div');
-      info.className = 'min-w-0';
+      info.className = 'min-w-0 flex-1';
 
       const titleRow = document.createElement('div');
       titleRow.className = 'flex flex-wrap items-center gap-1.5';
@@ -392,6 +719,13 @@
         titleRow.appendChild(badge);
       }
 
+      if (entry.lentTo) {
+        const lentBadge = document.createElement('span');
+        lentBadge.className = 'text-[11px] font-semibold px-2 py-0.5 rounded-full bg-sky-100 dark:bg-sky-900/50 text-sky-800 dark:text-sky-300';
+        lentBadge.textContent = '🤝 Lent to ' + entry.lentTo;
+        titleRow.appendChild(lentBadge);
+      }
+
       const loc = document.createElement('p');
       loc.className = 'text-sm text-stone-600 dark:text-stone-300 mt-1 break-words';
       loc.textContent = '📍 ' + entry.place;
@@ -406,19 +740,37 @@
         info.appendChild(note);
       }
 
-      if (entry.date) {
-        const dt = document.createElement('p');
-        dt.className = 'text-[11px] text-stone-400 dark:text-stone-500 mt-1.5';
-        dt.textContent = '🕒 ' + entry.date;
-        info.appendChild(dt);
+      const metaRow = document.createElement('div');
+      metaRow.className = 'flex flex-wrap items-center gap-2 mt-1.5';
+
+      const exp = getExpiryStatus(entry.expiry);
+      if (exp) {
+        const expBadge = document.createElement('span');
+        expBadge.className = exp.type === 'expired'
+          ? 'text-[11px] font-bold px-2 py-0.5 rounded-full bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300'
+          : exp.type === 'soon'
+            ? 'text-[11px] font-bold px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/50 text-amber-800 dark:text-amber-300'
+            : 'text-[11px] font-medium px-2 py-0.5 rounded-full bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400';
+        expBadge.textContent = exp.label;
+        metaRow.appendChild(expBadge);
       }
 
-      const actions = document.createElement('div');
-      actions.className = 'shrink-0 flex items-center gap-1';
+      if (entry.date) {
+        const dt = document.createElement('span');
+        dt.className = 'text-[11px] text-stone-400 dark:text-stone-500';
+        dt.textContent = '🕒 ' + entry.date;
+        metaRow.appendChild(dt);
+      }
+
+      if (metaRow.children.length > 0) {
+        info.appendChild(metaRow);
+      }
+
+      leftGroup.appendChild(info);
 
       const pinBtn = document.createElement('button');
       pinBtn.type = 'button';
-      pinBtn.className = 'text-sm px-2 py-1 rounded-lg hover:bg-amber-100 dark:hover:bg-stone-800 transition cursor-pointer';
+      pinBtn.className = 'shrink-0 text-sm px-2 py-1 rounded-lg hover:bg-amber-100 dark:hover:bg-stone-800 transition cursor-pointer';
       pinBtn.title = entry.pinned ? 'Unpin' : 'Pin';
       pinBtn.textContent = entry.pinned ? '📌' : '📍';
       pinBtn.addEventListener('click', function () {
@@ -427,9 +779,48 @@
         renderAll();
       });
 
+      topRow.appendChild(leftGroup);
+      topRow.appendChild(pinBtn);
+      li.appendChild(topRow);
+
+      // Action bar
+      const actionBar = document.createElement('div');
+      actionBar.className = 'flex flex-wrap items-center justify-end gap-1.5 pt-2 border-t border-stone-100 dark:border-stone-800/80';
+
+      if (entry.lentTo) {
+        const returnBtn = document.createElement('button');
+        returnBtn.type = 'button';
+        returnBtn.className = 'text-xs font-semibold text-sky-700 dark:text-sky-300 bg-sky-50 dark:bg-sky-950/50 hover:bg-sky-100 dark:hover:bg-sky-900/60 px-2.5 py-1 rounded-lg transition cursor-pointer';
+        returnBtn.textContent = '✓ Returned';
+        returnBtn.addEventListener('click', function () {
+          entry.lentTo = '';
+          entry.lentDate = '';
+          saveItems();
+          renderAll();
+          showToast('Marked as returned!');
+        });
+        actionBar.appendChild(returnBtn);
+      }
+
+      const shareBtn = document.createElement('button');
+      shareBtn.type = 'button';
+      shareBtn.className = 'text-xs font-semibold text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 px-2.5 py-1 rounded-lg transition cursor-pointer';
+      shareBtn.textContent = '📤 Share';
+      shareBtn.addEventListener('click', function () {
+        shareItem(entry);
+      });
+
+      const moveBtn = document.createElement('button');
+      moveBtn.type = 'button';
+      moveBtn.className = 'text-xs font-semibold text-amber-700 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/40 px-2.5 py-1 rounded-lg transition cursor-pointer';
+      moveBtn.textContent = '📦 Move';
+      moveBtn.addEventListener('click', function () {
+        openMoveModal(entry);
+      });
+
       const editBtn = document.createElement('button');
       editBtn.type = 'button';
-      editBtn.className = 'text-xs font-semibold text-stone-500 dark:text-stone-400 hover:text-amber-700 dark:hover:text-amber-300 px-2 py-1 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 transition cursor-pointer';
+      editBtn.className = 'text-xs font-semibold text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 px-2.5 py-1 rounded-lg transition cursor-pointer';
       editBtn.textContent = 'Edit';
       editBtn.addEventListener('click', function () {
         startEdit(entry);
@@ -460,23 +851,38 @@
         showToast('Item removed');
       });
 
-      actions.appendChild(pinBtn);
-      actions.appendChild(editBtn);
-      actions.appendChild(delBtn);
+      actionBar.appendChild(shareBtn);
+      actionBar.appendChild(moveBtn);
+      actionBar.appendChild(editBtn);
+      actionBar.appendChild(delBtn);
+      li.appendChild(actionBar);
 
-      topRow.appendChild(info);
-      topRow.appendChild(actions);
-      li.appendChild(topRow);
       return li;
     }
 
     function renderHome() {
       const pinnedItems = items.filter(function (x) { return x.pinned; });
+      const lentItems = items.filter(function (x) { return Boolean(x.lentTo); });
       const uniqueRooms = new Set(items.map(function (x) { return (x.room || '').trim(); }).filter(Boolean));
+      const dueItems = items.filter(function (x) {
+        const s = getExpiryStatus(x.expiry);
+        return s && (s.type === 'expired' || s.type === 'soon');
+      });
 
       document.getElementById('stat-total').textContent = items.length;
       document.getElementById('stat-pinned').textContent = pinnedItems.length;
+      document.getElementById('stat-lent').textContent = lentItems.length;
       document.getElementById('stat-rooms').textContent = uniqueRooms.size;
+
+      const expBanner = document.getElementById('home-expiry-banner');
+      if (dueItems.length > 0) {
+        expBanner.classList.remove('hidden');
+        document.getElementById('home-expiry-desc').textContent =
+          dueItems.length + (dueItems.length === 1 ? ' item needs attention: ' : ' items need attention: ') +
+          dueItems.slice(0, 2).map(function (x) { return x.name; }).join(', ');
+      } else {
+        expBanner.classList.add('hidden');
+      }
 
       const pinnedList = document.getElementById('home-pinned-list');
       const pinnedEmpty = document.getElementById('home-pinned-empty');
@@ -493,24 +899,32 @@
     }
 
     function renderItemsView() {
-      const roomsSet = new Set(['All']);
+      const filters = ['All'];
+      if (items.some(function (x) { return Boolean(x.lentTo); })) filters.push('Lent');
+      if (items.some(function (x) {
+        const s = getExpiryStatus(x.expiry);
+        return s && (s.type === 'expired' || s.type === 'soon');
+      })) filters.push('Expiring');
+
       items.forEach(function (x) {
-        if (x.room && x.room.trim()) roomsSet.add(x.room.trim());
+        if (x.room && x.room.trim() && filters.indexOf(x.room.trim()) === -1) {
+          filters.push(x.room.trim());
+        }
       });
-      if (!roomsSet.has(activeRoom)) activeRoom = 'All';
+      if (filters.indexOf(activeFilter) === -1) activeFilter = 'All';
 
       const filterBar = document.getElementById('room-filter-bar');
       filterBar.innerHTML = '';
-      roomsSet.forEach(function (r) {
+      filters.forEach(function (f) {
         const btn = document.createElement('button');
         btn.type = 'button';
-        const isActive = r === activeRoom;
+        const isActive = f === activeFilter;
         btn.className = isActive
           ? 'px-3 py-1 rounded-full text-xs font-bold bg-amber-600 text-white cursor-pointer'
           : 'px-3 py-1 rounded-full text-xs font-medium bg-stone-200 dark:bg-stone-800 text-stone-700 dark:text-stone-300 hover:bg-stone-300 dark:hover:bg-stone-700 cursor-pointer';
-        btn.textContent = r;
+        btn.textContent = f === 'Lent' ? '🤝 Lent Out' : f === 'Expiring' ? '⏳ Due Soon' : f;
         btn.addEventListener('click', function () {
-          activeRoom = r;
+          activeFilter = f;
           renderItemsView();
         });
         filterBar.appendChild(btn);
@@ -519,9 +933,17 @@
       const q = searchQuery.trim().toLowerCase();
       const filtered = items
         .filter(function (entry) {
-          const matchesRoom = activeRoom === 'All' || entry.room === activeRoom;
-          const hay = (entry.name + ' ' + entry.place + ' ' + (entry.room || '') + ' ' + (entry.note || '')).toLowerCase();
-          return matchesRoom && (!q || hay.includes(q));
+          let matchesFilter = true;
+          if (activeFilter === 'Lent') {
+            matchesFilter = Boolean(entry.lentTo);
+          } else if (activeFilter === 'Expiring') {
+            const s = getExpiryStatus(entry.expiry);
+            matchesFilter = Boolean(s && (s.type === 'expired' || s.type === 'soon'));
+          } else if (activeFilter !== 'All') {
+            matchesFilter = entry.room === activeFilter;
+          }
+          const hay = (entry.name + ' ' + entry.place + ' ' + (entry.room || '') + ' ' + (entry.note || '') + ' ' + (entry.lentTo || '')).toLowerCase();
+          return matchesFilter && (!q || hay.includes(q));
         })
         .sort(function (a, b) { return (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0); });
 
@@ -563,29 +985,50 @@
       const keys = Object.keys(counts);
       if (keys.length === 0) {
         container.innerHTML = '<p class="col-span-2 text-xs text-stone-500">Add items with rooms to see your breakdown here.</p>';
-        return;
+      } else {
+        keys.sort().forEach(function (roomName) {
+          const card = document.createElement('button');
+          card.type = 'button';
+          card.className = 'rounded-2xl bg-stone-100 dark:bg-stone-800 hover:bg-amber-50 dark:hover:bg-stone-700 p-3 text-left transition cursor-pointer';
+          const nameEl = document.createElement('p');
+          nameEl.className = 'font-bold text-sm text-stone-900 dark:text-stone-100 truncate';
+          nameEl.textContent = roomName;
+          const countEl = document.createElement('p');
+          countEl.className = 'text-xs text-stone-500 dark:text-stone-400 mt-0.5';
+          countEl.textContent = counts[roomName] + (counts[roomName] === 1 ? ' item' : ' items');
+          card.appendChild(nameEl);
+          card.appendChild(countEl);
+          card.addEventListener('click', function () {
+            activeFilter = roomName === 'Untagged' ? 'All' : roomName;
+            searchQuery = '';
+            document.getElementById('list-search-input').value = '';
+            switchView('items');
+          });
+          container.appendChild(card);
+        });
       }
 
-      keys.sort().forEach(function (roomName) {
-        const card = document.createElement('button');
-        card.type = 'button';
-        card.className = 'rounded-2xl bg-stone-100 dark:bg-stone-800 hover:bg-amber-50 dark:hover:bg-stone-700 p-3 text-left transition cursor-pointer';
-        card.innerHTML = '';
-        const nameEl = document.createElement('p');
-        nameEl.className = 'font-bold text-sm text-stone-900 dark:text-stone-100 truncate';
-        nameEl.textContent = roomName;
-        const countEl = document.createElement('p');
-        countEl.className = 'text-xs text-stone-500 dark:text-stone-400 mt-0.5';
-        countEl.textContent = counts[roomName] + (counts[roomName] === 1 ? ' item' : ' items');
-        card.appendChild(nameEl);
-        card.appendChild(countEl);
-        card.addEventListener('click', function () {
-          activeRoom = roomName === 'Untagged' ? 'All' : roomName;
-          searchQuery = '';
-          document.getElementById('list-search-input').value = '';
-          switchView('items');
+      // Render presets manager
+      const manageList = document.getElementById('presets-manage-list');
+      manageList.innerHTML = '';
+      roomPresets.forEach(function (roomName) {
+        const pill = document.createElement('span');
+        pill.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-200 border border-stone-200 dark:border-stone-700';
+        const label = document.createElement('span');
+        label.textContent = roomName;
+        const rm = document.createElement('button');
+        rm.type = 'button';
+        rm.className = 'text-stone-400 hover:text-red-600 font-bold cursor-pointer';
+        rm.textContent = '✕';
+        rm.title = 'Remove preset';
+        rm.addEventListener('click', function () {
+          roomPresets = roomPresets.filter(function (r) { return r !== roomName; });
+          saveRooms();
+          renderAll();
         });
-        container.appendChild(card);
+        pill.appendChild(label);
+        pill.appendChild(rm);
+        manageList.appendChild(pill);
       });
     }
 
@@ -593,6 +1036,23 @@
       renderHome();
       renderItemsView();
       renderMoreView();
+      renderRoomPresetChips('form-room-presets', 'f-room');
+    }
+
+    function setPhotoPreview(dataUrl) {
+      currentPhotoData = dataUrl || '';
+      const wrap = document.getElementById('f-photo-preview-wrap');
+      const img = document.getElementById('f-photo-preview');
+      const rmBtn = document.getElementById('f-photo-remove');
+      if (currentPhotoData) {
+        img.src = currentPhotoData;
+        wrap.classList.remove('hidden');
+        rmBtn.classList.remove('hidden');
+      } else {
+        img.src = '';
+        wrap.classList.add('hidden');
+        rmBtn.classList.add('hidden');
+      }
     }
 
     function resetForm() {
@@ -601,6 +1061,8 @@
       document.getElementById('f-submit-btn').textContent = 'Save Location';
       document.getElementById('form-cancel-btn').classList.add('hidden');
       document.getElementById('item-form').reset();
+      document.getElementById('f-lent-fields').classList.add('hidden');
+      setPhotoPreview('');
     }
 
     function startEdit(entry) {
@@ -612,9 +1074,72 @@
       document.getElementById('f-place').value = entry.place;
       document.getElementById('f-room').value = entry.room || '';
       document.getElementById('f-note').value = entry.note || '';
+      document.getElementById('f-expiry').value = entry.expiry || '';
       document.getElementById('f-pinned').checked = Boolean(entry.pinned);
+
+      const isLent = Boolean(entry.lentTo);
+      document.getElementById('f-lent').checked = isLent;
+      document.getElementById('f-lent-fields').classList.toggle('hidden', !isLent);
+      document.getElementById('f-lent-to').value = entry.lentTo || '';
+      document.getElementById('f-lent-date').value = entry.lentDate || '';
+
+      setPhotoPreview(entry.photo || '');
       switchView('add', { keepEditing: true });
     }
+
+    // Lent checkbox toggle
+    document.getElementById('f-lent').addEventListener('change', function (e) {
+      const checked = e.target.checked;
+      document.getElementById('f-lent-fields').classList.toggle('hidden', !checked);
+      if (checked && !document.getElementById('f-lent-date').value) {
+        const now = new Date();
+        const yyyy = now.getFullYear();
+        const mm = String(now.getMonth() + 1).padStart(2, '0');
+        const dd = String(now.getDate()).padStart(2, '0');
+        document.getElementById('f-lent-date').value = yyyy + '-' + mm + '-' + dd;
+      }
+    });
+
+    // Photo capture & compression
+    document.getElementById('f-photo-btn').addEventListener('click', function () {
+      document.getElementById('f-photo').value = '';
+      document.getElementById('f-photo').click();
+    });
+
+    document.getElementById('f-photo-remove').addEventListener('click', function () {
+      setPhotoPreview('');
+    });
+
+    document.getElementById('f-photo').addEventListener('change', function (e) {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function (ev) {
+        const img = new Image();
+        img.onload = function () {
+          const maxDim = 640;
+          let w = img.width;
+          let h = img.height;
+          if (w > maxDim || h > maxDim) {
+            if (w > h) {
+              h = Math.round((h * maxDim) / w);
+              w = maxDim;
+            } else {
+              w = Math.round((w * maxDim) / h);
+              h = maxDim;
+            }
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, w, h);
+          setPhotoPreview(canvas.toDataURL('image/jpeg', 0.65));
+        };
+        img.src = ev.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
 
     // Form submit
     document.getElementById('item-form').addEventListener('submit', function (e) {
@@ -623,7 +1148,11 @@
       const place = document.getElementById('f-place').value.trim();
       const room = document.getElementById('f-room').value.trim();
       const note = document.getElementById('f-note').value.trim();
+      const expiry = document.getElementById('f-expiry').value;
       const pinned = document.getElementById('f-pinned').checked;
+      const isLent = document.getElementById('f-lent').checked;
+      const lentTo = isLent ? document.getElementById('f-lent-to').value.trim() : '';
+      const lentDate = isLent && lentTo ? document.getElementById('f-lent-date').value : '';
       if (!name || !place) return;
 
       const today = new Date().toLocaleDateString();
@@ -634,12 +1163,28 @@
           target.place = place;
           target.room = room;
           target.note = note;
+          target.expiry = expiry;
           target.pinned = pinned;
+          target.lentTo = lentTo;
+          target.lentDate = lentDate;
+          target.photo = currentPhotoData;
           target.date = 'Updated ' + today;
         }
         showToast('Item updated!');
       } else {
-        items.unshift({ id: nextId++, name: name, place: place, room: room, note: note, pinned: pinned, date: today });
+        items.unshift({
+          id: nextId++,
+          name: name,
+          place: place,
+          room: room,
+          note: note,
+          expiry: expiry,
+          pinned: pinned,
+          lentTo: lentTo,
+          lentDate: lentDate,
+          photo: currentPhotoData,
+          date: today
+        });
         showToast('Saved "' + name + '"!');
       }
 
@@ -653,6 +1198,70 @@
       switchView('items');
     });
 
+    // Move modal
+    document.getElementById('move-form').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const newPlace = document.getElementById('move-place').value.trim();
+      const newRoom = document.getElementById('move-room').value.trim();
+      if (!newPlace || movingId === null) return;
+      const target = items.find(function (x) { return x.id === movingId; });
+      if (target) {
+        const oldSpot = target.place + (target.room ? ' (' + target.room + ')' : '');
+        if (target.place !== newPlace) {
+          const prevText = 'Previously: ' + oldSpot;
+          target.note = target.note
+            ? (target.note.includes('Previously:') ? target.note.replace(/Previously:.*$/, prevText) : target.note + ' · ' + prevText)
+            : prevText;
+        }
+        target.place = newPlace;
+        target.room = newRoom;
+        target.date = 'Moved ' + new Date().toLocaleDateString();
+        saveItems();
+        showToast('Moved to "' + newPlace + '"!');
+      }
+      closeMoveModal();
+      renderAll();
+    });
+
+    document.getElementById('share-close-btn').addEventListener('click', closeShareModal);
+    document.getElementById('share-modal').addEventListener('click', function (e) {
+      if (e.target.id === 'share-modal') closeShareModal();
+    });
+    document.getElementById('share-copy-btn').addEventListener('click', function () {
+      copyTextFallback(activeShareText);
+      closeShareModal();
+    });
+    document.getElementById('share-native-btn').addEventListener('click', function () {
+      if (navigator.share) {
+        navigator.share({ title: activeShareTitle, text: activeShareText }).catch(function () {
+          copyTextFallback(activeShareText);
+        });
+      } else {
+        copyTextFallback(activeShareText);
+      }
+      closeShareModal();
+    });
+    document.getElementById('move-close-btn').addEventListener('click', closeMoveModal);
+    document.getElementById('move-cancel-btn').addEventListener('click', closeMoveModal);
+    document.getElementById('photo-modal-close').addEventListener('click', closePhotoModal);
+    document.getElementById('photo-modal').addEventListener('click', function (e) {
+      if (e.target.id === 'photo-modal') closePhotoModal();
+    });
+
+    // Presets form
+    document.getElementById('preset-form').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const val = document.getElementById('preset-input').value.trim();
+      if (!val) return;
+      if (roomPresets.indexOf(val) === -1) {
+        roomPresets.push(val);
+        saveRooms();
+        renderAll();
+        showToast('Added "' + val + '" preset');
+      }
+      document.getElementById('preset-input').value = '';
+    });
+
     // Navigation & shortcuts
     document.querySelectorAll('.nav-btn').forEach(function (btn) {
       btn.addEventListener('click', function () {
@@ -663,17 +1272,19 @@
     document.getElementById('home-add-btn').addEventListener('click', function () { switchView('add'); });
     document.getElementById('home-list-btn').addEventListener('click', function () { switchView('items'); });
     document.getElementById('items-add-btn').addEventListener('click', function () { switchView('add'); });
-    document.getElementById('home-see-all-btn').addEventListener('click', function () { switchView('items'); });
-    document.getElementById('stat-total-btn').addEventListener('click', function () { activeRoom = 'All'; switchView('items'); });
-    document.getElementById('stat-pinned-btn').addEventListener('click', function () { activeRoom = 'All'; switchView('items'); });
+    document.getElementById('home-see-all-btn').addEventListener('click', function () { activeFilter = 'All'; switchView('items'); });
+    document.getElementById('stat-total-btn').addEventListener('click', function () { activeFilter = 'All'; switchView('items'); });
+    document.getElementById('stat-pinned-btn').addEventListener('click', function () { activeFilter = 'All'; switchView('items'); });
+    document.getElementById('stat-lent-btn').addEventListener('click', function () { activeFilter = 'Lent'; switchView('items'); });
     document.getElementById('stat-rooms-btn').addEventListener('click', function () { switchView('more'); });
+    document.getElementById('home-expiry-banner').addEventListener('click', function () { activeFilter = 'Expiring'; switchView('items'); });
 
     // Search sync
     document.getElementById('home-search-input').addEventListener('input', function (e) {
       searchQuery = e.target.value;
       document.getElementById('list-search-input').value = searchQuery;
       if (searchQuery.trim()) {
-        activeRoom = 'All';
+        activeFilter = 'All';
         switchView('items');
         document.getElementById('list-search-input').focus();
       }
@@ -687,7 +1298,7 @@
 
     document.getElementById('clear-filter-btn').addEventListener('click', function () {
       searchQuery = '';
-      activeRoom = 'All';
+      activeFilter = 'All';
       document.getElementById('list-search-input').value = '';
       document.getElementById('home-search-input').value = '';
       renderItemsView();
@@ -739,6 +1350,10 @@
               place: String(x.place || x.location),
               room: x.room ? String(x.room) : '',
               note: x.note ? String(x.note) : '',
+              expiry: x.expiry ? String(x.expiry) : '',
+              lentTo: x.lentTo ? String(x.lentTo) : '',
+              lentDate: x.lentDate ? String(x.lentDate) : '',
+              photo: x.photo ? String(x.photo) : '',
               pinned: Boolean(x.pinned),
               date: x.date ? String(x.date) : ''
             };
@@ -774,11 +1389,10 @@
     // Init
     switchView('home');
   </script>
-    <script>
+  <script>
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('./sw.js');
     }
   </script>
-
 </body>
 </html>
