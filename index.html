@@ -40,10 +40,11 @@
         </div>
         <div class="min-w-0 leading-tight">
           <div class="font-bold tracking-tight text-sm sm:text-base text-slate-900 dark:text-white truncate">Where Did I Put It?</div>
-          <div class="text-[10px] font-semibold text-slate-400 dark:text-slate-500">v7.0</div>
+          <div class="text-[10px] font-semibold text-slate-400 dark:text-slate-500">v8.2</div>
         </div>
       </div>
       <div class="flex items-center gap-1.5 shrink-0">
+        <span id="cloud-status-pill" class="hidden text-[10px] font-bold px-2 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">Cloud</span>
         <button
           id="header-lock-btn"
           type="button"
@@ -485,6 +486,51 @@
         <p class="text-xs text-slate-500 dark:text-slate-400">Browse rooms, print QR labels, manage PIN lock, or back up your list.</p>
       </div>
 
+      <!-- Family Cloud Sync (Live) -->
+      <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-5 shadow-2xs space-y-3">
+        <div class="flex items-center justify-between gap-2">
+          <div>
+            <h2 class="text-sm font-bold text-slate-800 dark:text-slate-200">Family Cloud Sync (Live)</h2>
+            <p id="cloud-desc-text" class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Sync shared items live across family phones (private items stay local).</p>
+          </div>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          <div>
+            <label for="cloud-member-name" class="block text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">Your Name</label>
+            <input id="cloud-member-name" type="text" placeholder="e.g., Najeeb" class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-amber-500" />
+          </div>
+          <div>
+            <label for="cloud-group-code" class="block text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">Family Group Code</label>
+            <input id="cloud-group-code" type="text" placeholder="e.g., NAJEEB-HOME" class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-amber-500" />
+          </div>
+        </div>
+        <details class="text-xs">
+          <summary class="cursor-pointer font-semibold text-slate-500 dark:text-slate-400 select-none">Cloud Server (pre-configured — tap to view/edit)</summary>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mt-2">
+            <div>
+              <label for="cloud-project-id" class="block text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">Firebase Project ID</label>
+              <input id="cloud-project-id" type="text" value="where-i-put-it" class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-amber-500" />
+            </div>
+            <div>
+              <label for="cloud-api-key" class="block text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">Firebase Web API Key</label>
+              <input id="cloud-api-key" type="password" value="AIzaSyCI4ntDUFVA4bY_nEmVGEB4cuUCDqjWwXo" class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-amber-500" />
+            </div>
+          </div>
+        </details>
+        <div class="flex flex-wrap gap-2 pt-1">
+          <button id="cloud-create-btn" type="button" class="rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-3.5 py-2 transition cursor-pointer">
+            Create New Group
+          </button>
+          <button id="cloud-join-btn" type="button" class="rounded-xl bg-slate-900 dark:bg-slate-700 hover:bg-slate-800 text-white text-xs font-bold px-3.5 py-2 transition cursor-pointer">
+            Join Existing
+          </button>
+          <button id="cloud-disconnect-btn" type="button" class="hidden rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold px-3.5 py-2 transition cursor-pointer">
+            Disconnect
+          </button>
+        </div>
+        <p id="cloud-sync-msg" class="hidden text-xs font-semibold"></p>
+      </div>
+
       <!-- Rooms Breakdown + QR Labels -->
       <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-4 shadow-2xs">
         <div class="flex items-center justify-between mb-3">
@@ -829,6 +875,7 @@
     const PIN_KEY = 'where_i_put_it_v5_pin';
     const NOTIF_KEY = 'where_i_put_it_v5_last_notif';
     const THEME_KEY = 'where_i_put_it_v2_theme';
+    const CLOUD_KEY = 'where_i_put_it_v8_cloud';
 
     const DEFAULT_ITEMS = [];
     const DEFAULT_ROOMS = ['Documents', 'Living Room', 'Bedroom', 'Kitchen', 'Entryway', 'Car', 'Office'];
@@ -874,14 +921,122 @@
     let confirmDeleteId = null;
     let confirmTimer = null;
     let toastTimer = null;
+    let cloudPollTimer = null;
+    let cloudConfig = (function () {
+      try {
+        const raw = localStorage.getItem(CLOUD_KEY);
+        if (raw) return JSON.parse(raw);
+      } catch (e) {}
+      return { memberName: '', groupCode: '', projectId: 'where-i-put-it', apiKey: 'AIzaSyCI4ntDUFVA4bY_nEmVGEB4cuUCDqjWwXo', enabled: false };
+    })();
 
-    function saveItems() {
+    function saveItems(skipCloudPush) {
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+        if (!skipCloudPush && cloudConfig && cloudConfig.enabled) {
+          pushToCloud();
+        }
         return true;
       } catch (e) {
         showToast('Storage full! Try removing large photos or exporting backup.');
         return false;
+      }
+    }
+
+    function saveCloudConfig() {
+      try { localStorage.setItem(CLOUD_KEY, JSON.stringify(cloudConfig)); } catch (e) {}
+    }
+
+    function getCloudUrl() {
+      const pid = encodeURIComponent((cloudConfig.projectId || '').trim());
+      const grp = encodeURIComponent((cloudConfig.groupCode || '').trim().toUpperCase().replace(/[^A-Z0-9_-]/g, ''));
+      const key = encodeURIComponent((cloudConfig.apiKey || '').trim());
+      if (!pid || !grp || !key) return '';
+      return 'https://firestore.googleapis.com/v1/projects/' + pid + '/databases/(default)/documents/families/' + grp + '?key=' + key;
+    }
+
+    function setCloudMessage(text, isErr) {
+      const el = document.getElementById('cloud-sync-msg');
+      if (!el) return;
+      el.textContent = text;
+      el.className = isErr
+        ? 'text-xs font-semibold text-red-600 dark:text-red-400'
+        : 'text-xs font-semibold text-emerald-700 dark:text-emerald-400';
+      el.classList.remove('hidden');
+    }
+
+    function updateCloudUI() {
+      const pill = document.getElementById('cloud-status-pill');
+      const discBtn = document.getElementById('cloud-disconnect-btn');
+      const nameIn = document.getElementById('cloud-member-name');
+      const grpIn = document.getElementById('cloud-group-code');
+      const pidIn = document.getElementById('cloud-project-id');
+      const keyIn = document.getElementById('cloud-api-key');
+      if (nameIn && !nameIn.value && cloudConfig.memberName) nameIn.value = cloudConfig.memberName;
+      if (grpIn && !grpIn.value && cloudConfig.groupCode) grpIn.value = cloudConfig.groupCode;
+      if (pidIn && !pidIn.value && cloudConfig.projectId) pidIn.value = cloudConfig.projectId;
+      if (keyIn && !keyIn.value && cloudConfig.apiKey) keyIn.value = cloudConfig.apiKey;
+      if (pill) pill.classList.toggle('hidden', !cloudConfig.enabled);
+      if (discBtn) discBtn.classList.toggle('hidden', !cloudConfig.enabled);
+    }
+
+    function pushToCloud() {
+      const url = getCloudUrl();
+      if (!url || !navigator.onLine) return;
+      const shared = items.filter(function (x) { return !x.isPrivate; }).map(function (x) {
+        const copy = Object.assign({}, x);
+        if (copy.photo && copy.photo.length > 120000) delete copy.photo;
+        return copy;
+      });
+      const payload = {
+        fields: {
+          itemsJson: { stringValue: JSON.stringify(shared) },
+          updatedAt: { stringValue: new Date().toISOString() },
+          updatedBy: { stringValue: cloudConfig.memberName || 'Family' }
+        }
+      };
+      fetch(url, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      }).then(function (res) {
+        if (!res.ok) throw new Error('Sync error ' + res.status);
+        setCloudMessage('Synced with "' + cloudConfig.groupCode + '" just now.', false);
+      }).catch(function () {
+        setCloudMessage('Cloud sync failed. Check Project ID, API Key, and Firestore rules.', true);
+      });
+    }
+
+    function pullFromCloud(isManual) {
+      const url = getCloudUrl();
+      if (!url || !navigator.onLine) return;
+      fetch(url).then(function (res) {
+        if (res.status === 404) {
+          if (isManual) pushToCloud();
+          return null;
+        }
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.json();
+      }).then(function (doc) {
+        if (!doc || !doc.fields || !doc.fields.itemsJson) return;
+        const remote = JSON.parse(doc.fields.itemsJson.stringValue || '[]');
+        if (!Array.isArray(remote)) return;
+        const privates = items.filter(function (x) { return x.isPrivate; });
+        items = remote.concat(privates);
+        nextId = items.reduce(function (m, x) { return Math.max(m, x.id || 0); }, 0) + 1;
+        saveItems(true);
+        renderAll();
+        if (isManual) setCloudMessage('Connected & synced (' + remote.length + ' shared items)!', false);
+      }).catch(function () {
+        if (isManual) setCloudMessage('Could not connect. Verify Project ID, API Key & Firestore Test Mode.', true);
+      });
+    }
+
+    function startCloudPolling() {
+      if (cloudPollTimer) clearInterval(cloudPollTimer);
+      if (cloudConfig && cloudConfig.enabled) {
+        pullFromCloud(false);
+        cloudPollTimer = setInterval(function () { pullFromCloud(false); }, 15000);
       }
     }
 
@@ -1360,6 +1515,12 @@
         dt.textContent = entry.date;
         metaRow.appendChild(dt);
       }
+      if (entry.updatedBy) {
+        const ub = document.createElement('span');
+        ub.className = 'text-[11px] text-slate-400 dark:text-slate-500';
+        ub.textContent = 'by ' + entry.updatedBy;
+        metaRow.appendChild(ub);
+      }
 
       if (metaRow.children.length > 0) info.appendChild(metaRow);
       leftGroup.appendChild(info);
@@ -1761,6 +1922,7 @@
 
     function renderAll() {
       updateNotifUI();
+      updateCloudUI();
       renderHeaderLock();
       renderHome();
       renderItemsView();
@@ -1955,6 +2117,7 @@
           target.photo = currentPhotoData;
           target.photoPin = currentPhotoPin;
           target.date = 'Updated ' + today;
+          if (cloudConfig.memberName) target.updatedBy = cloudConfig.memberName;
         }
         showToast('Item updated!');
       } else {
@@ -1973,6 +2136,7 @@
           lentDate: lentDate,
           photo: currentPhotoData,
           photoPin: currentPhotoPin,
+          updatedBy: cloudConfig.memberName || '',
           date: today
         });
         showToast('Saved "' + name + '"!');
@@ -2055,6 +2219,7 @@
         target.place = newPlace;
         target.room = newRoom;
         target.date = 'Moved ' + new Date().toLocaleDateString();
+        if (cloudConfig.memberName) target.updatedBy = cloudConfig.memberName;
         saveItems();
         showToast('Moved to "' + newPlace + '"!');
       }
@@ -2198,6 +2363,74 @@
     });
 
     // QR modal listeners
+    function readCloudInputs(requireCode) {
+      cloudConfig.memberName = document.getElementById('cloud-member-name').value.trim();
+      cloudConfig.groupCode = document.getElementById('cloud-group-code').value.trim().toUpperCase().replace(/[^A-Z0-9_-]/g, '');
+      cloudConfig.projectId = document.getElementById('cloud-project-id').value.trim();
+      cloudConfig.apiKey = document.getElementById('cloud-api-key').value.trim();
+      if (!cloudConfig.projectId || !cloudConfig.apiKey) {
+        setCloudMessage('Missing Firebase Project ID or API Key.', true);
+        return false;
+      }
+      if (requireCode && !cloudConfig.groupCode) {
+        setCloudMessage('Enter a Family Group Code first.', true);
+        return false;
+      }
+      return true;
+    }
+
+    document.getElementById('cloud-create-btn').addEventListener('click', function () {
+      if (!readCloudInputs(false)) return;
+      if (!cloudConfig.groupCode) {
+        const prefix = (cloudConfig.memberName || 'FAMILY').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6) || 'FAMILY';
+        cloudConfig.groupCode = prefix + '-' + Math.floor(1000 + Math.random() * 9000);
+        document.getElementById('cloud-group-code').value = cloudConfig.groupCode;
+      }
+      const url = getCloudUrl();
+      setCloudMessage('Checking code availability...', false);
+      fetch(url).then(function (res) {
+        if (res.status === 200) {
+          setCloudMessage('"' + cloudConfig.groupCode + '" is already taken! Try another code or tap Join Existing.', true);
+          return;
+        }
+        if (res.status !== 404) throw new Error('HTTP ' + res.status);
+        cloudConfig.enabled = true;
+        saveCloudConfig();
+        updateCloudUI();
+        pushToCloud();
+        startCloudPolling();
+        setCloudMessage('Created group "' + cloudConfig.groupCode + '"! Share this code with family.', false);
+      }).catch(function () {
+        setCloudMessage('Could not create group. Check internet & Firestore Rules.', true);
+      });
+    });
+
+    document.getElementById('cloud-join-btn').addEventListener('click', function () {
+      if (!readCloudInputs(true)) return;
+      const url = getCloudUrl();
+      setCloudMessage('Looking up "' + cloudConfig.groupCode + '"...', false);
+      fetch(url).then(function (res) {
+        if (res.status === 404) {
+          setCloudMessage('No group found for "' + cloudConfig.groupCode + '". Check spelling or tap Create New Group.', true);
+          return;
+        }
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        cloudConfig.enabled = true;
+        saveCloudConfig();
+        updateCloudUI();
+        pullFromCloud(true);
+        startCloudPolling();
+      }).catch(function () {
+        setCloudMessage('Could not join group. Check internet & Firestore Rules.', true);
+      });
+    });
+    document.getElementById('cloud-disconnect-btn').addEventListener('click', function () {
+      cloudConfig.enabled = false;
+      saveCloudConfig();
+      if (cloudPollTimer) clearInterval(cloudPollTimer);
+      updateCloudUI();
+      setCloudMessage('Disconnected from Family Cloud.', false);
+    });
     document.getElementById('qr-close-btn').addEventListener('click', closeQrModal);
     document.getElementById('qr-save-btn').addEventListener('click', function () {
       try {
@@ -2414,6 +2647,7 @@
       } catch (e) {}
       switchView('home');
       requestAndCheckNotifications(false);
+      startCloudPolling();
     })();
   </script>
   <script>

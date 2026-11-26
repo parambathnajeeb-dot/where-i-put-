@@ -1,4 +1,4 @@
-const CACHE_NAME = 'where-i-put-it-v7';
+const CACHE_NAME = 'where-i-put-it-v8-2';
 const LOCAL_ASSETS = [
   './',
   './index.html',
